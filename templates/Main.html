@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>세렝게티 게시판</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      /* 게시물 내부에서 스크롤 가능하도록 설정 */
+      .section {
+        width: 100%;
+        height: 100vh; /* 화면 전체 높이 */
+        overflow-y: auto; /* 스크롤 가능하게 설정 */
+        padding: 24px;
+      }
+
+      /* 6줄까지 표시되도록 설정 */
+      .text-preview {
+        display: -webkit-box;
+        -webkit-line-clamp: 6;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      @media screen and (max-width: 767px) {
+        body {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100">
+    <header class="bg-white shadow-md p-4 flex flex-col items-center">
+      <h1 class="text-4xl font-bold text-gray-800 text-center">
+        세렝게티 게시판
+      </h1>
+      <div>
+        <button
+        id="myPageBtn"
+        class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center "
+      >
+      마이페이지
+      </button>
+      <button
+      id="addCardBtn"
+      class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center 
+       "
+    >
+    게시물 작성
+    </button>
+      </div>
+      
+      <div class="searching flex items-center space-x-2 mt-4">
+        <label for="searching" class="font-bold">검색하기</label>
+        <input
+          id="searching"
+          type="text"
+          name="searching"
+          class="border border-black p-1 rounded pos w-full sm:w-72 md:w-96 lg:w-[500px]"
+        />
+        <button
+          id="searchBtn"
+          class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400 "
+        >
+          검색
+        </button>
+       
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">게시글 목록</h2>
+      </div>
+
+      <!-- 카드 컨테이너 -->
+      <div
+        id="cardsContainer"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      ></div>
+
+      <!-- 로딩 스피너 -->
+      <div id="loading" class="text-center hidden mt-4">
+        <span class="text-gray-500">더 불러오는 중...</span>
+        
+      </div>
+    </section>
+
+    <script>
+      let articles = [];
+      let currentIndex = 0;
+      const loadCount = 9;
+      let isFetching = false;
+      $(document).ready(function () {
+        $("#myPageBtn").click(function () {
+          window.location.href = "mypage.html";
+        });
+      });
+
+      $(document).ready(function () {
+        $("#addCardBtn").click(function () {
+          window.location.href = "post.html";
+        });
+
+        //rjatorrlsmd
+        //   $("#searchBtn").click(function () {
+        //       let searchText = $("#searching").val().toLowerCase();
+        //       $(".card-item").each(function () {
+        //           let title = $(this).find(".card-title").text().toLowerCase();
+        //           $(this).toggle(title.includes(searchText));
+        //       });
+        //   });
+        //찬영아 더미 데이터 들어가있는거라 지우고 하면 된다.
+        generateDummyData(30);
+        loadMoreArticles();
+
+        /* 게시판 내부에서 스크롤 시 추가 로드 */
+        $(".section").on("scroll", function () {
+          let scrollTop = $(".section").scrollTop();
+          let sectionHeight = $(".section").innerHeight();
+          let documentHeight = $("#cardsContainer").outerHeight();
+
+          if (scrollTop + sectionHeight >= documentHeight - 100) {
+            if (!isFetching) {
+              isFetching = true;
+              $("#loading").show();
+              setTimeout(() => {
+                loadMoreArticles();
+                $("#loading").hide();
+                isFetching = false;
+              }, 1000);
+            }
+          }
+        });
+      });
+
+      function generateDummyData(count) {
+        for (let i = 0; i < count; i++) {
+          articles.push({
+            image:
+              i % 3 === 0
+                ? ""
+                : "https://source.unsplash.com/400x300/?nature,water",
+            url: "https://example.com",
+            title: `게시물 제목 ${i + 1}`,
+            desc: "이곳에 게시물 내용 첫 줄 3줄 정도. 게시물의 내용을 여기에 입력하세요. 내용이 길어질 경우 6줄까지만 표시됩니다.",
+          });
+        }
+      }
+
+      function loadMoreArticles() {
+        let newArticles = articles.slice(
+          currentIndex,
+          currentIndex + loadCount
+        );
+        newArticles.forEach((article) => {
+          addCard(article.image, article.url, article.title, article.desc);
+        });
+        currentIndex += loadCount;
+
+        if (currentIndex >= articles.length) {
+          $("#loading").hide();
+        }
+      }
+
+      function addCard(image, url, title, desc) {
+        let cardHTML = `
+              <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
+                  ${
+                    image
+                      ? `<img src="${image}" alt="Card Image" class="w-full h-48 object-cover">`
+                      : ""
+                  }
+                  <div class="p-4">
+                      <a href="${url}" target="_blank" class="card-title text-lg font-bold text-blue-500 hover:underline">${title}</a>
+                      <p class="text-gray-700 mt-2 text-preview">${desc}</p>
+                  </div>
+              </div>
+          `;
+        $("#cardsContainer").append(cardHTML);
+      }
+    </script>
+  </body>
+</html>
