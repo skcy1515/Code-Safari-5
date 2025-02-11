@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>내 게시물 조회</title>
+    <title>게시글 작성</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -14,62 +14,121 @@
         padding: 20px;
       }
       .page-title {
-        text-align: center;
-        font-size: 2rem;
+        font-size: 32px;
         font-weight: bold;
-        margin-top: 50px;
+        margin-bottom: 20px;
+        margin-top: 60px;
       }
       .container {
-        background-color: #fff;
-        padding: 30px;
+        max-width: 1200px;
+        background: white;
+        padding: 40px;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: auto;
+        margin-top: 30px;
       }
-      .post-item {
-        padding: 15px;
-        border-bottom: 1px solid #ddd;
-        cursor: pointer;
+      .form-control {
+        font-size: 1.2rem;
       }
-      .post-item:hover {
-        background-color: #f8f9fa;
+      .btn-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
       }
     </style>
   </head>
   <body>
-    <div class="page-title">내 게시물 조회</div>
-    <div class="container mt-4">
-      <ul id="postList" class="list-unstyled"></ul>
+    <div class="page-title text-center">게시글 작성</div>
+
+    <div class="container">
+      <form id="postForm">
+        <div class="mb-3">
+          <label for="title" class="form-label">제목</label>
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            placeholder="제목을 입력하세요"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="content" class="form-label">내용</label>
+          <textarea
+            class="form-control"
+            id="content"
+            rows="6"
+            placeholder="내용을 입력하세요"
+            required
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="file" class="form-label">파일 추가</label>
+          <input class="form-control" type="file" id="file" />
+        </div>
+        <div class="btn-container">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            onclick="cancelPost()"
+          >
+            작성취소
+          </button>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      $(document).ready(function () {
-        loadMyPosts();
-      });
-
-      function loadMyPosts() {
-        $.ajax({
-          url: "/get_my_posts",
-          type: "GET",
-          dataType: "json",
-          success: function (response) {
-            if (response.result === "success") {
-              let posts = response.posts;
-              let postList = $("#postList");
-              postList.empty();
-              posts.forEach((post) => {
-                postList.append(
-                  `<li class="post-item" onclick="location.href='/post/view/${post.id}'">
-                    <strong>${post.title}</strong>
-                  </li>`
-                );
-              });
-            }
-          },
-          error: function () {
-            alert("게시물을 불러오는 중 오류가 발생했습니다.");
-          },
-        });
+      function cancelPost() {
+        window.location.href = "/"; // 메인 페이지로 이동
       }
+
+      // 게시글 작성
+      $(document).ready(function () {
+        $("#postForm").submit(function (event) {
+          event.preventDefault(); // 기본 폼 제출 방지
+
+          let title = $("#title").val().trim();
+          let content = $("#content").val().trim();
+          let file = $("#file")[0].files[0]; // 파일 선택
+
+          if (title === "" || content === "") {
+            alert("제목과 내용을 입력해주세요.");
+            return;
+          }
+
+          let formData = new FormData();
+          formData.append("title", title);
+          formData.append("content", content);
+          if (file) {
+            formData.append("file", file);
+          }
+
+          $.ajax({
+            url: "/post",
+            type: "POST",
+            data: formData,
+            processData: false, // FormData 사용 시 false로 설정
+            contentType: false, // FormData 사용 시 false로 설정
+            success: function (response) {
+              if (response.result === "success") {
+                alert(response.msg);
+                window.location.href = "/"; // 메인 페이지로 이동
+              }
+            },
+            error: function (xhr) {
+              if (xhr.status === 401) {
+                alert(xhr.responseJSON.msg);
+                window.location.href = "/login";
+              }
+            },
+          });
+        });
+      });
     </script>
   </body>
 </html>
