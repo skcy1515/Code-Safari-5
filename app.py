@@ -46,6 +46,18 @@ def show_post(postid):
 def show_main():
     return render_template('index.html')
 
+@app.route('/post_write')
+def make_post():
+    return render_template('post_write.html')
+
+@app.route('/post/edit/<postid>')
+def edit_post(postid):
+    post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # postid로 게시글 조회
+    if not post:
+        return jsonify({"result": "fail", "msg": "게시글을 찾을 수 없습니다."}), 404
+
+    return render_template('post_edit.html', post=post)
+
 # 회원가입
 @app.route('/sign_up', methods=['POST'])
 def signup():
@@ -87,7 +99,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('userid', None)  # 세션 삭제
-    return jsonify({"msg": "로그아웃 되었습니다."}), 200
+    return jsonify({"result": "success", "msg": "로그아웃 되었습니다."}), 200
 
 # 게시물 작성
 @app.route('/post', methods=['POST'])
@@ -145,6 +157,8 @@ def get_posts():
 # 특정 게시글 조회
 @app.route('/post/view/<postid>', methods=['GET'])
 def get_post(postid):
+    if 'userid' not in session:
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
     # 게시글 찾기
     post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # _id 제외
     if not post:
@@ -159,11 +173,29 @@ def get_post(postid):
         "message": "게시글과 댓글을 성공적으로 조회했습니다.",
         "data": {
             "post": post,
-            "comments": comments
+            "comments": comments            
         }
     }
 
     return jsonify({'result': 'success', 'response' : response}), 200
+
+# 특정 게시글 조회 (수정)
+@app.route('/post/editPost/<postid>', methods=['GET'])
+def get_post_edit(postid):
+    print(postid)
+    if 'userid' not in session:
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    # 게시글 찾기
+    post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # _id 제외
+    if not post:
+        return jsonify({"status": "fail", "message": "해당 게시글을 찾을 수 없습니다."}), 400
+    
+    # 응답 데이터 수정 (중첩 제거)
+    return jsonify({
+        "result": "success",
+        "message": "게시글을 성공적으로 조회했습니다.",
+        "post": post
+    }), 200
 
 # 댓글 작성
 @app.route('/post/<postid>/comment', methods=['POST'])
@@ -232,6 +264,84 @@ def delete_account():
     session.clear()  # 세션 삭제 (로그아웃)
     
     return jsonify({"msg": "탈퇴되었습니다."}), 200
+
+# 게시글과 댓글 삭제
+@app.route('/post/<postid>', methods=['DELETE'])
+def delete_post(postid):
+    if 'userid' not in session:
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+
+    # 게시글 찾기
+    post = db.Posts.find_one({"postid": postid})
+    if not post:
+        return jsonify({'result': 'fail', 'msg': '게시물을 찾을 수 없습니다.'}), 404
+    
+    # 게시글에 첨부된 파일이 있으면 삭제
+    if post.get("file"):  # 파일이 존재하면
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(post["file"]))
+        
+    # 파일 존재 여부 확인 후 삭제
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"파일 삭제됨: {file_path}")  # 로그 확인용
+
+    # 게시글 삭제
+    db.Posts.delete_one({"postid": postid})
+
+    # 해당 게시글의 모든 댓글 삭제
+    db.Comments.delete_many({"postid": postid})
+
+    return jsonify({'result': 'success', 'msg': '게시물과 댓글이 삭제되었습니다.'}), 200
+
+# 수정
+@app.route('/post/<postid>', methods=['PUT'])
+def update_post(postid):
+    if 'userid' not in session:
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    
+    post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # postid로 게시글 조회
+
+    # 요청 데이터 받기
+    title = request.form.get("title")
+    content = request.form.get("content")
+    file = request.files.get("file")
+
+    update_data = {
+        "title": title,
+        "content": content,
+        "updatedat": datetime.now()
+    }
+
+     # 기존 파일 삭제 로직 추가
+    if post.get("file"):  
+        old_file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(post["file"]))
+        try:
+            if os.path.exists(old_file_path):  
+                os.remove(old_file_path)  
+                print(f"기존 파일 삭제됨: {old_file_path}")  
+        except Exception as e:
+            print(f"기존 파일 삭제 중 오류 발생: {e}")  
+
+    # 파일 업로드 처리
+    if file:
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+
+        # 파일 이름이 중복되면 처리
+        while os.path.exists(file_path):
+            name, extension = os.path.splitext(filename)
+            filename = f"{name}_new{extension}"
+            file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+
+        file.save(file_path)
+        update_data["file"] = f"/static/uploads/{filename}"
+        update_data["isimage"] = filename.rsplit(".", 1)[-1].lower() in {"png", "jpg", "jpeg", "gif", "webp"}
+
+    # 게시글 수정
+    db.Posts.update_one({"postid": postid}, {"$set": update_data})
+
+    return jsonify({'result': 'success', 'msg': '게시물이 수정되었습니다.'}), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)

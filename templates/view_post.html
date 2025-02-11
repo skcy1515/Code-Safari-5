@@ -43,31 +43,32 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       $(document).ready(function () {
+        //더미데이터 부분분
+        generateDummyData(20);
         loadMyPosts();
       });
 
+      let articles = [];
+
+
+      function generateDummyData(count) {
+        for (let i = 0; i < count; i++) {
+          articles.push({
+            title: `게시물 제목 ${i + 1}`,
+          });
+        }
+      }
+
       function loadMyPosts() {
-        $.ajax({
-          url: "/get_my_posts",
-          type: "GET",
-          dataType: "json",
-          success: function (response) {
-            if (response.result === "success") {
-              let posts = response.posts;
-              let postList = $("#postList");
-              postList.empty();
-              posts.forEach((post) => {
-                postList.append(
-                  `<li class="post-item" onclick="location.href='/post/view/${post.id}'">
-                    <strong>${post.title}</strong>
-                  </li>`
-                );
-              });
-            }
-          },
-          error: function () {
-            alert("게시물을 불러오는 중 오류가 발생했습니다.");
-          },
+        let postList = $("#postList");
+        postList.empty();
+        articles.forEach((post, index) => {
+          postList.append(
+            //DB 연결
+            `<li class="post-item" onclick="location.href='/post/view/${index + 1}'"
+              <strong>${post.title}</strong>
+            </li>`
+          );
         });
       }
     </script>

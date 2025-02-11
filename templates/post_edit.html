@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>게시물 수정</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+      .page-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        margin-top: 60px;
+      }
+      .container {
+        max-width: 1200px;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: auto;
+        margin-top: 30px;
+      }
+      .form-control {
+        font-size: 1.2rem;
+      }
+      .btn-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-title text-center">게시물 수정</div>
+
+    <div class="container">
+      <form id="editPostForm">
+        <input type="hidden" id="postid" />
+        <div class="mb-3">
+          <label for="title" class="form-label">제목</label>
+          <input type="text" class="form-control" id="title" required />
+        </div>
+        <div class="mb-3">
+          <label for="content" class="form-label">내용</label>
+          <textarea
+            class="form-control"
+            id="content"
+            rows="6"
+            required
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="file" class="form-label">파일 추가</label>
+          <input class="form-control" type="file" id="file" />
+          <div id="filePreview" class="mt-2"></div>
+        </div>
+        <div class="btn-container">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            onclick="cancelEdit()"
+          >
+            취소
+          </button>
+          <button type="submit" class="btn btn-primary">수정</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      let postid = window.location.pathname.split("/").pop(); // URL에서 postid 추출
+
+      $(document).ready(function () {
+        loadPostData(); // 기존 게시글 데이터 불러오기
+
+        $("#editPostForm").submit(function (event) {
+          event.preventDefault(); // 기본 폼 제출 방지
+          updatePost(); // 게시글 수정 요청
+        });
+      });
+
+      function loadPostData() {
+        $.ajax({
+          url: `/post/editPost/${postid}`,
+          type: "GET",
+          dataType: "json",
+          success: function (response) {
+            console.log(response);
+            if (response.result === "success") {
+              let post = response.post;
+              console.log(post);
+
+              // 기존 데이터 입력
+              $("#postid").val(post.postid);
+              $("#title").val(post.title);
+              $("#content").val(post.content);
+
+              // 기존 파일 미리보기
+              if (post.file) {
+                let filePreview = post.isimage
+                  ? `<img src="${post.file}" alt="첨부 이미지" class="w-50 rounded-lg shadow">`
+                  : `<a href="${post.file}" download class="btn btn-sm btn-secondary">첨부 파일 다운로드</a>`;
+                $("#filePreview").html(filePreview);
+              }
+            } else {
+              alert("게시글을 불러오는 데 실패했습니다.");
+            }
+          },
+          error: function (xhr) {
+            console.log(xhr.status);
+            alert("게시글을 불러오는 중 오류가 발생했습니다.");
+          },
+        });
+      }
+
+      function updatePost() {
+        let title = $("#title").val().trim();
+        let content = $("#content").val().trim();
+        let file = $("#file")[0].files[0];
+
+        if (title === "" || content === "") {
+          alert("제목과 내용을 입력해주세요.");
+          return;
+        }
+
+        let formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        if (file) {
+          formData.append("file", file);
+        }
+
+        $.ajax({
+          url: `/post/${postid}`,
+          type: "PUT",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            if (response.result === "success") {
+              alert("게시물이 수정되었습니다!");
+              window.location.href = `/post/${postid}`;
+            } else {
+              alert("수정 실패: " + response.msg);
+            }
+          },
+          error: function () {
+            alert("게시물 수정 중 오류가 발생했습니다.");
+          },
+        });
+      }
+
+      function cancelEdit() {
+        window.location.href = `/post/${postid}`;
+      }
+    </script>
+  </body>
+</html>
