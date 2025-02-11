@@ -44,15 +44,31 @@
 
   <body class="bg-gray-100">
     <header class="bg-white shadow-md p-4 flex flex-col items-center">
-      <h1 class="text-3xl font-bold text-gray-800 text-center">
-        세렝게티 게시판
-      </h1>
-      <div class="mypage_location">
+      <div class="flex justify-between items-center w-full p-4">
+        <h1 class="text-4xl font-bold text-gray-800 text-center flex-1">
+          세렝게티 게시판
+        </h1>
+        <button
+          id="logOutBtn"
+          class="hover:text-red-500 active:text-red-700 duration-300 ease-in-out text-black px-4 py-2 font-bold"
+          onclick="logout();"
+        >
+          로그아웃
+        </button>
+      </div>
+
+      <div>
         <button
           id="myPageBtn"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+          class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center"
         >
           마이페이지
+        </button>
+        <button
+          id="addCardBtn"
+          class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center"
+        >
+          게시물 작성
         </button>
       </div>
 
@@ -69,12 +85,6 @@
           class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
         >
           검색
-        </button>
-        <button
-          id="addCardBtn"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition postings"
-        >
-          게시물 작성
         </button>
       </div>
     </header>
@@ -101,6 +111,20 @@
         showMyMain();
         loadPosts();
       });
+
+      function logout() {
+        $.ajax({
+          url: "/logout",
+          dataType: "json",
+          success: function (response) {
+            console.log(response);
+            if (response.result === "success") {
+              alert(response.msg);
+              window.location.href = "/login"; // 로그인 페이지로 이동
+            }
+          },
+        });
+      }
 
       function showMyMain() {
         $.ajax({
@@ -129,7 +153,13 @@
             if (response.result === "success") {
               $("#cardsContainer").empty(); // 기존 목록 초기화
               response.posts.forEach((post) => {
-                addCard(post.file, post.title, post.content, post.postid);
+                addCard(
+                  post.file,
+                  post.title,
+                  post.content,
+                  post.postid,
+                  post.isimage
+                );
               });
             }
           },
@@ -151,7 +181,7 @@
 
       $(document).ready(function () {
         $("#addCardBtn").click(function () {
-          window.location.href = "post.html";
+          window.location.href = "/post_write";
         });
 
         loadMoreArticles();
@@ -191,21 +221,21 @@
         }
       }
 
-      function addCard(file, title, content, postid) {
+      function addCard(file, title, content, postid, isimage) {
         let postUrl = `/post/${postid}`;
 
         let cardHTML = `
-              <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
-                  ${
-                    file
-                      ? `<img src="${file}" alt="Card Image" class="w-full h-48 object-cover">`
-                      : ""
-                  }
-                  <div class="p-4">
-                      <a href="${postUrl}" class="card-title text-lg font-bold text-blue-500 hover:underline">${title}</a>
-                      <p class="text-gray-700 mt-2 text-preview">${content}</p>
-                  </div>
+          <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
+              ${
+                file && isimage
+                  ? `<img src="${file}" alt="Card Image" class="w-full h-48 object-cover">`
+                  : ""
+              }
+              <div class="p-4">
+                  <a href="${postUrl}" class="card-title text-lg font-bold text-blue-500 hover:underline">${title}</a>
+                  <p class="text-gray-700 mt-2 text-preview">${content}</p>
               </div>
+          </div>
           `;
         $("#cardsContainer").append(cardHTML);
       }

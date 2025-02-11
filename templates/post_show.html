@@ -78,17 +78,13 @@
         <!-- 제목 삽입 -->
       </div>
       <hr />
+      <div id="fileContainer" class="mt-4"></div>
       <article>
         <p id="postContent">게시글 내용</p>
         <!-- 게시물 내용 삽입 -->
       </article>
       <footer class="button-group d-flex justify-content-end gap-2 mt-4">
-        <button
-          class="btn btn-dark"
-          onclick="window.location.href='postEdit.html';"
-        >
-          수정
-        </button>
+        <button class="btn btn-dark" onclick="redirectToEdit()">수정</button>
         <!-- 게시물 수정 페이지로 이동 -->
         <button class="btn btn-danger" onclick="deletePost()">삭제</button>
       </footer>
@@ -119,21 +115,45 @@
         loadPost(); // 게시글 불러오기
       });
 
+      function redirectToEdit() {
+        window.location.href = `/post/edit/${postid}`;
+      }
+
       function loadPost() {
         $.ajax({
           url: `/post/view/${postid}`,
           type: "GET",
-          dataType: "json",
           success: function (response) {
             console.log(response);
             if (response["result"] === "success") {
               let post = response.response.data.post;
               let comments = response.response.data.comments;
-              console.log(comments);
 
               // 게시글 정보 삽입
               $("#postTitle").text(post.title);
               $("#postContent").text(post.content);
+
+              // 파일이 있을 경우 처리
+              if (post.file) {
+                let fileContainer = $("#fileContainer"); // 파일 컨테이너 요소
+
+                // 기존 내용 삭제 후 새로운 요소 추가
+                fileContainer.empty();
+
+                if (post.isimage) {
+                  // 이미지 파일이면 <img> 태그로 표시
+                  let imgElement = `<img src="${post.file}" alt="첨부 이미지" class="w-full max-w-md rounded-lg shadow-md">`;
+                  fileContainer.append(imgElement);
+                } else {
+                  // 이미지가 아니면 다운로드 버튼 추가
+                  let fileName = post.file.split("/").pop(); // 파일명 추출
+                  let downloadBtn = `
+                <a href="${post.file}" download="${fileName}" class="bg-green-500 px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                    파일 다운로드 (${fileName})
+                </a><p></p>`;
+                  fileContainer.append(downloadBtn);
+                }
+              }
 
               // 댓글 불러오기
               $("#commentList").empty();
@@ -181,7 +201,7 @@
           },
           success: function (response) {
             if (response.result === "success") {
-              addCommentToList(response.content); // 작성자 정보 반영
+              addCommentToList(response.content);
               $("#commentInput").val(""); // 입력창 초기화
             } else {
               alert("댓글 작성에 실패했습니다.");
@@ -200,10 +220,10 @@
             type: "DELETE",
             success: function (response) {
               if (response.result === "success") {
-                alert("게시물이 삭제되었습니다.");
-                window.location.href = "/";
+                alert("게시물과 해당 댓글이 삭제되었습니다.");
+                window.location.href = "/"; // 메인 페이지로 이동
               } else {
-                alert("게시물 삭제에 실패했습니다.");
+                alert("게시물 삭제에 실패했습니다: " + response.msg);
               }
             },
             error: function () {

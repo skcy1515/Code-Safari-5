@@ -1,110 +1,133 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>게시물 작성</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
-        body {
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
-        .page-title {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            margin-top: 60px;
-        }
-        .container {
-            max-width: 1200px;
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: auto;
-            margin-top: 30px;
-        }
-        .form-control {
-            font-size: 1.2rem;
-        }
-        .btn-container {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
+      body {
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+      .page-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        margin-top: 60px;
+      }
+      .container {
+        max-width: 1200px;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: auto;
+        margin-top: 30px;
+      }
+      .form-control {
+        font-size: 1.2rem;
+      }
+      .btn-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
     </style>
-</head>
-<body>
-    
+  </head>
+  <body>
     <div class="page-title text-center">게시물 작성</div>
 
-    
     <div class="container">
-        <form id="postForm">
-            <div class="mb-3">
-                <label for="title" class="form-label">제목</label>
-                <input type="text" class="form-control" id="title" placeholder="제목을 입력하세요" required>
-            </div>
-            <div class="mb-3">
-                <label for="content" class="form-label">내용</label>
-                <textarea class="form-control" id="content" rows="6" placeholder="내용을 입력하세요" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="file" class="form-label">파일 추가</label>
-                <input class="form-control" type="file" id="file">
-            </div>
-            <div class="btn-container">
-                <button type="button" class="btn btn-outline-secondary" onclick="cancelPost()">작성취소</button>
-                <button type="submit" class="btn btn-primary">저장</button>
-            </div>
-        </form>
+      <form id="postForm">
+        <div class="mb-3">
+          <label for="title" class="form-label">제목</label>
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            placeholder="제목을 입력하세요"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="content" class="form-label">내용</label>
+          <textarea
+            class="form-control"
+            id="content"
+            rows="6"
+            placeholder="내용을 입력하세요"
+            required
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="file" class="form-label">파일 추가</label>
+          <input class="form-control" type="file" id="file" />
+        </div>
+        <div class="btn-container">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            onclick="cancelPost()"
+          >
+            작성취소
+          </button>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+      function cancelPost() {
+        window.location.href = "/"; // 메인 페이지로 이동
+      }
 
-        function cancelPost() {
-            window.location.href = 'index.html';  // 메인 페이지로 변경경
-        }
+      $(document).ready(function () {
+        $("#postForm").submit(function (event) {
+          event.preventDefault(); // 기본 폼 제출 방지
 
-        
-        document.getElementById("postForm").addEventListener("submit", function(event) {
-            event.preventDefault(); 
+          let title = $("#title").val().trim();
+          let content = $("#content").val().trim();
+          let file = $("#file")[0].files[0]; // 파일 선택
 
-            let title = document.getElementById("title").value.trim();
-            let content = document.getElementById("content").value.trim();
+          if (title === "" || content === "") {
+            alert("제목과 내용을 입력해주세요.");
+            return;
+          }
 
-            if (title === "" || content === "") {
-                alert("제목과 내용을 입력해주세요.");
-                return;
-            }
+          let formData = new FormData();
+          formData.append("title", title);
+          formData.append("content", content);
+          if (file) {
+            formData.append("file", file);
+          }
 
-            let formData = new FormData();
-            formData.append("title", title);
-            formData.append("content", content);
-            formData.append("file", document.getElementById("file").files[0]); // 파일 첨부
-
-            // 서버로 데이터 전송 - 수정 
-            fetch("/savePost", {
-                method: "POST",
-                body: formData
-            })
-
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("게시물이 저장되었습니다!");
-                    window.location.href = "index.html"; 
-                } else {
-                    alert("저장 실패: " + data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("게시물 저장 중 오류가 발생했습니다.");
-            });
+          $.ajax({
+            url: "/post",
+            type: "POST",
+            data: formData,
+            processData: false, // FormData 사용 시 false로 설정
+            contentType: false, // FormData 사용 시 false로 설정
+            success: function (response) {
+              if (response.result === "success") {
+                alert("게시물이 저장되었습니다!");
+                window.location.href = "/"; // 메인 페이지로 이동
+              } else {
+                alert("저장 실패: " + response.msg);
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("Error:", error);
+              alert("게시물 저장 중 오류가 발생했습니다.");
+            },
+          });
         });
+      });
     </script>
-</body>
+  </body>
 </html>
