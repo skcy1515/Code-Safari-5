@@ -1,151 +1,224 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>게시물 상세</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
-        
-        body {
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
-        .home-icon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border: 2px solid black;
-            text-align: center;
-            line-height: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 5px;
-            font-size: 24px;
-        }
-        .post-title {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            margin-top: 60px;
-        }
-        .comment-container {
-            margin-top: 30px;
-        }
-        
-        .profile-image {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: gray;
-            margin-right: 10px;
-        } 
-        .comment-name {
-            font-weight: bold;
-        }
+      body {
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+      .home-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
+        text-align: center;
+        line-height: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 5px;
+        font-size: 24px;
+      }
+      .post-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        margin-top: 60px;
+      }
+      .comment-container {
+        margin-top: 30px;
+      }
 
-        
-        .comment-input-wrapper {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+      .profile-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: gray;
+        margin-right: 10px;
+      }
+      .comment-name {
+        font-weight: bold;
+      }
 
-        .comment-input {
-            flex-grow: 1; 
-        }
+      .comment-input-wrapper {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
 
-       
-        .btn {
-            white-space: nowrap; 
-        }
+      .comment-input {
+        flex-grow: 1;
+      }
+
+      .btn {
+        white-space: nowrap;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- 홈 버튼 -->
-    <div class="home-icon" onclick="window.location.href='index.html';">🏠</div> <!--메인페이지 파일로 수정해야 함-->
+    <div class="home-icon" onclick="window.location.href='/'">🏠</div>
+    <!--메인페이지 파일로 수정해야 함-->
 
     <h2 class="post-title text-center">게시물</h2>
     <section class="container bg-white p-4 rounded border shadow">
-        <div class="post-header d-flex justify-content-between align-items-center">
-            <h1 id="postTitle">게시물 제목</h1> <!-- 제목 삽입 -->
-        </div>
-        <hr>
-        <article>
-            <p id="postContent">게시글 내용</p> <!-- 게시물 내용 삽입 -->
-        </article>
-        <footer class="button-group d-flex justify-content-end gap-2 mt-4">
-            <button class="btn btn-dark" onclick="window.location.href='postEdit.html';">수정</button> <!-- 게시물 수정 페이지로 이동 -->
-            <button class="btn btn-danger" onclick="deletePost()">삭제</button>
-        </footer>
+      <div
+        class="post-header d-flex justify-content-between align-items-center"
+      >
+        <h1 id="postTitle">게시물 제목</h1>
+        <!-- 제목 삽입 -->
+      </div>
+      <hr />
+      <article>
+        <p id="postContent">게시글 내용</p>
+        <!-- 게시물 내용 삽입 -->
+      </article>
+      <footer class="button-group d-flex justify-content-end gap-2 mt-4">
+        <button
+          class="btn btn-dark"
+          onclick="window.location.href='postEdit.html';"
+        >
+          수정
+        </button>
+        <!-- 게시물 수정 페이지로 이동 -->
+        <button class="btn btn-danger" onclick="deletePost()">삭제</button>
+      </footer>
     </section>
 
     <!-- 댓글 입력 -->
     <section class="comment-container">
-        <div class="container bg-white p-4 rounded border shadow">
-            <!-- 댓글 입력란과 버튼을 가로로 배치 -->
-            <div class="comment-input-wrapper">
-                <input type="text" id="commentInput" class="form-control comment-input" placeholder="댓글 입력">
-                <button class="btn btn-primary" onclick="addComment()">작성</button>
-            </div>
-            <ul id="commentList" class="list-unstyled mt-4"></ul>
+      <div class="container bg-white p-4 rounded border shadow">
+        <!-- 댓글 입력란과 버튼을 가로로 배치 -->
+        <div class="comment-input-wrapper">
+          <input
+            type="text"
+            id="commentInput"
+            class="form-control comment-input"
+            placeholder="댓글 입력"
+          />
+          <button class="btn btn-primary" onclick="addComment()">작성</button>
         </div>
+        <ul id="commentList" class="list-unstyled mt-4"></ul>
+      </div>
     </section>
 
+    <!-- jQuery 추가 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        let commentCount = 1; // 댓글 작성 순서를 추적
+      let postid = window.location.pathname.split("/").pop(); // URL에서 postid 추출
+      $(document).ready(function () {
+        loadPost(); // 게시글 불러오기
+      });
 
-        // 삭제 - 나중에 DB 연결...?
-        function deletePost() {
-            let confirmDelete = confirm("게시물을 삭제하시겠습니까?");
-            if (confirmDelete) {
+      function loadPost() {
+        $.ajax({
+          url: `/post/view/${postid}`,
+          type: "GET",
+          dataType: "json",
+          success: function (response) {
+            console.log(response);
+            if (response["result"] === "success") {
+              let post = response.response.data.post;
+              let comments = response.response.data.comments;
+              console.log(comments);
+
+              // 게시글 정보 삽입
+              $("#postTitle").text(post.title);
+              $("#postContent").text(post.content);
+
+              // 댓글 불러오기
+              $("#commentList").empty();
+              // 개별 댓글 데이터 확인
+              comments.forEach((comment) => {
+                console.log(`내용: ${comment.content}`);
+              });
+
+              comments.forEach((comment) => {
+                console.log(comment.content);
+                addCommentToList(comment.content);
+              });
+            } else {
+              alert("게시글을 불러오는 데 실패했습니다.");
+            }
+          },
+          error: function () {
+            alert("게시글을 불러오는 중 오류가 발생했습니다.");
+          },
+        });
+      }
+
+      function addCommentToList(content) {
+        let commentHTML = `
+                <li class="p-2 border-bottom">
+                    <strong>익명</strong>: ${content}
+                </li>
+            `;
+        $("#commentList").append(commentHTML);
+      }
+
+      function addComment() {
+        let commentInput = $("#commentInput").val().trim();
+        if (commentInput === "") {
+          alert("댓글을 입력해주세요.");
+          return;
+        }
+
+        $.ajax({
+          url: `/post/${postid}/comment`,
+          type: "POST",
+          data: {
+            content: commentInput,
+            postid: postid,
+          },
+          success: function (response) {
+            if (response.result === "success") {
+              addCommentToList(response.content); // 작성자 정보 반영
+              $("#commentInput").val(""); // 입력창 초기화
+            } else {
+              alert("댓글 작성에 실패했습니다.");
+            }
+          },
+          error: function () {
+            alert("댓글 작성 중 오류가 발생했습니다.");
+          },
+        });
+      }
+
+      function deletePost() {
+        if (confirm("게시물을 삭제하시겠습니까?")) {
+          $.ajax({
+            url: `/post/${postid}`,
+            type: "DELETE",
+            success: function (response) {
+              if (response.result === "success") {
                 alert("게시물이 삭제되었습니다.");
-            }
+                window.location.href = "/";
+              } else {
+                alert("게시물 삭제에 실패했습니다.");
+              }
+            },
+            error: function () {
+              alert("게시물 삭제 중 오류가 발생했습니다.");
+            },
+          });
         }
+      }
 
-        function addComment() {
-            let commentInput = document.getElementById('commentInput');
-            let commentList = document.getElementById('commentList');
-            
-            if (commentInput.value.trim() === "") {
-                alert("댓글을 입력해주세요.");
-                return;
-            }
-
-            // 댓글 항목을 생성
-            let li = document.createElement('li');
-            li.className = "d-flex align-items-center p-2 border-bottom";
-
-            // 프로필 이미지
-            let profileImage = document.createElement('div');
-            profileImage.className = "profile-image";
-
-            
-            let commentText = document.createElement('div');
-            commentText.className = "d-flex flex-column";
-            let commentName = document.createElement('div');
-            commentName.className = "comment-name";
-            commentName.textContent = "익명" + commentCount;
-            let commentContent = document.createElement('div');
-            commentContent.textContent = commentInput.value;
-
-            commentText.appendChild(commentName);
-            commentText.appendChild(commentContent);
-
-            li.appendChild(profileImage);
-            li.appendChild(commentText);
-            commentList.appendChild(li);
-            
-            commentCount++; // 댓글 번호 증가
-            commentInput.value = ""; // 입력창 리셋
-        }
+      function editPost() {
+        window.location.href = `/post/${postid}/edit`; // 수정 페이지로 이동
+      }
     </script>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-</body>
+  </body>
 </html>

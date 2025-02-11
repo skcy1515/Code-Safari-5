@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>세렝게티 게시판</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      /* 게시물 내부에서 스크롤 가능하도록 설정 */
+      .section {
+        width: 100%;
+        height: 100vh; /* 화면 전체 높이 */
+        overflow-y: auto; /* 스크롤 가능하게 설정 */
+        padding: 24px;
+      }
+
+      /* 6줄까지 표시되도록 설정 */
+      .text-preview {
+        display: -webkit-box;
+        -webkit-line-clamp: 6;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .mypage_location {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+      .postings {
+        position: absolute;
+        top: 75px;
+        right: 10px;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100">
+    <header class="bg-white shadow-md p-4 flex flex-col items-center">
+      <h1 class="text-3xl font-bold text-gray-800 text-center">
+        세렝게티 게시판
+      </h1>
+      <div class="mypage_location">
+        <button
+          id="myPageBtn"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+        >
+          마이페이지
+        </button>
+      </div>
+
+      <div class="searching flex items-center space-x-2 mt-4">
+        <label for="searching" class="font-bold">검색하기</label>
+        <input
+          id="searching"
+          type="text"
+          name="searching"
+          class="border border-black p-1 rounded pos w-full sm:w-72 md:w-96 lg:w-[500px]"
+        />
+        <button
+          id="searchBtn"
+          class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
+        >
+          검색
+        </button>
+        <button
+          id="addCardBtn"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition postings"
+        >
+          게시물 작성
+        </button>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">게시글 목록</h2>
+      </div>
+
+      <!-- 카드 컨테이너 -->
+      <div
+        id="cardsContainer"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      ></div>
+
+      <!-- 로딩 스피너 -->
+      <div id="loading" class="text-center hidden mt-4">
+        <span class="text-gray-500">더 불러오는 중...</span>
+      </div>
+    </section>
+
+    <script>
+      $(document).ready(function () {
+        showMyMain();
+        loadPosts();
+      });
+
+      function showMyMain() {
+        $.ajax({
+          url: "/get_index",
+          type: "GET",
+          dataType: "json",
+          success: function (response) {
+            if (response.result !== "success") {
+              window.location.href = "/"; // 로그인 페이지로 이동
+            }
+          },
+          error: function (xhr) {
+            // error 처리 추가
+            alert("로그인이 필요합니다.");
+            window.location.href = "/login";
+          },
+        });
+      }
+
+      function loadPosts() {
+        $.ajax({
+          url: "/posts",
+          type: "GET",
+          dataType: "json",
+          success: function (response) {
+            if (response.result === "success") {
+              $("#cardsContainer").empty(); // 기존 목록 초기화
+              response.posts.forEach((post) => {
+                addCard(post.file, post.title, post.content, post.postid);
+              });
+            }
+          },
+          error: function () {
+            alert("게시글을 불러오는 중 오류가 발생했습니다.");
+          },
+        });
+      }
+
+      let articles = [];
+      let currentIndex = 0;
+      const loadCount = 9;
+      let isFetching = false;
+      $(document).ready(function () {
+        $("#myPageBtn").click(function () {
+          window.location.href = "/mypage";
+        });
+      });
+
+      $(document).ready(function () {
+        $("#addCardBtn").click(function () {
+          window.location.href = "post.html";
+        });
+
+        loadMoreArticles();
+
+        /* 게시판 내부에서 스크롤 시 추가 로드 */
+        $(".section").on("scroll", function () {
+          let scrollTop = $(".section").scrollTop();
+          let sectionHeight = $(".section").innerHeight();
+          let documentHeight = $("#cardsContainer").outerHeight();
+
+          if (scrollTop + sectionHeight >= documentHeight - 100) {
+            if (!isFetching) {
+              isFetching = true;
+              $("#loading").show();
+              setTimeout(() => {
+                loadMoreArticles();
+                $("#loading").hide();
+                isFetching = false;
+              }, 1000);
+            }
+          }
+        });
+      });
+
+      function loadMoreArticles() {
+        let newArticles = articles.slice(
+          currentIndex,
+          currentIndex + loadCount
+        );
+        newArticles.forEach((article) => {
+          addCard(post.image, post.title, post.content);
+        });
+        currentIndex += loadCount;
+
+        if (currentIndex >= articles.length) {
+          $("#loading").hide();
+        }
+      }
+
+      function addCard(file, title, content, postid) {
+        let postUrl = `/post/${postid}`;
+
+        let cardHTML = `
+              <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
+                  ${
+                    file
+                      ? `<img src="${file}" alt="Card Image" class="w-full h-48 object-cover">`
+                      : ""
+                  }
+                  <div class="p-4">
+                      <a href="${postUrl}" class="card-title text-lg font-bold text-blue-500 hover:underline">${title}</a>
+                      <p class="text-gray-700 mt-2 text-preview">${content}</p>
+                  </div>
+              </div>
+          `;
+        $("#cardsContainer").append(cardHTML);
+      }
+    </script>
+  </body>
+</html>

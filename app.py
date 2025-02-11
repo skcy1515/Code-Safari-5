@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect
+from flask import Flask, render_template, request, jsonify, session
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename # 파일 이름에 사용할 수 없는 특수 문자를 제거하여 안전한 파일 이름을 생성하는 유틸리티 함수
 from bson.objectid import ObjectId
@@ -22,31 +22,32 @@ client = MongoClient("mongodb+srv://skcy151515:IyuTp1jwPnkfLXXl@cluster0.es5up.m
 db = client.dbmemo2
 
 # 렌더링 부분
-@app.route('/')
-def home():
-    if 'userid' in session:  # 로그인 상태 확인
-        return render_template('home.html')
-    return render_template('index.html')
-@app.route('/home')
-def user_home():
-    if 'userid' in session:  # 로그인 상태 확인
-        return render_template('home.html')
-    return redirect('/')
-
-@app.route('/postH')
-def user_post():
-    return render_template('post.html')
-
 @app.route('/sign_up')
 def sign_up():
     return render_template('sign_up.html')
 
+@app.route('/mypage')
+def mypage():
+    return render_template('mypage.html')
+
+@app.route('/login')
+def show_login():
+    return render_template('sign_in.html')
+
 @app.route('/post/<postid>')
-def show_post():
-    return render_template('post_show.html')
+def show_post(postid):
+    post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # postid로 게시글 조회
+    if not post:
+        return jsonify({"result": "fail", "msg": "게시글을 찾을 수 없습니다."}), 404
+
+    return render_template('post_show.html', post=post)
+
+@app.route('/')
+def show_main():
+    return render_template('index.html')
 
 # 회원가입
-@app.route('/signup', methods=['POST'])
+@app.route('/sign_up', methods=['POST'])
 def signup():
     # data: { userid: userid, password: password, name: name, email: email } 형식으로 데이터 불러옴
     userid = request.form['userid']
@@ -56,16 +57,16 @@ def signup():
     
     # 기존 사용자 확인
     if db.Users.find_one({"userid": userid}):
-        return jsonify({"msg": "이미 존재하는 아이디입니다."})
+        return jsonify({"msg": "이미 존재하는 아이디입니다."}), 400
     if db.Users.find_one({"email" : email}):
-        return jsonify({"msg": "이미 존재하는 이메일입니다."})
+        return jsonify({"msg": "이미 존재하는 이메일입니다."}), 400
     
     # 비밀번호 해싱 (bcrypt 사용)
     hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     # 데이터 저장
     db.Users.insert_one({"userid": userid, "password": hashed_pw, "name": name, "email":email})
-    return jsonify({"result": "success", "msg": "회원가입 성공!"})
+    return jsonify({"result": "success", "msg": "회원가입 성공!"}), 200
 
 # 로그인
 @app.route('/login', methods=['POST'])
@@ -78,21 +79,21 @@ def login():
 
     if user and bcrypt.checkpw(password.encode('utf-8'), user["password"]):  # 비밀번호 비교
         session['userid'] = userid  # 세션 저장
-        return jsonify({"result": "success", "msg": "로그인 성공!"})
+        return jsonify({"result": "success", "msg": "로그인 성공!"}), 200
     else:
-        return jsonify({"result": "fail", "msg": "아이디 또는 비밀번호가 틀렸습니다."})
+        return jsonify({"result": "fail", "msg": "아이디 또는 비밀번호가 틀렸습니다."}), 400
 
 # 로그아웃
 @app.route('/logout')
 def logout():
     session.pop('userid', None)  # 세션 삭제
-    return jsonify({"msg": "로그아웃 되었습니다."})
+    return jsonify({"msg": "로그아웃 되었습니다."}), 200
 
 # 게시물 작성
 @app.route('/post', methods=['POST'])
 def uploadPost():
     if 'userid' not in session:
-        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'})
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
 
     # 파일과 제목, 내용을 담음
     file = request.files.get('file')  # 파일이 없을 경우 None 반환
@@ -133,28 +134,28 @@ def uploadPost():
     }
     db.Posts.insert_one(formData)
 
-    return jsonify({'result': 'success'})
+    return jsonify({'result': 'success'}), 200
     
 # 모든 게시글 목록 조회
 @app.route('/posts', methods=['GET'])
 def get_posts():
     posts = list(db.Posts.find({}, {'_id': 0}))  # 모든 게시글 가져오기
-    return jsonify({"result": "success", "posts": posts})
+    return jsonify({"result": "success", "posts": posts}), 200
 
 # 특정 게시글 조회
-@app.route('/post/<postid>', methods=['GET'])
+@app.route('/post/view/<postid>', methods=['GET'])
 def get_post(postid):
     # 게시글 찾기
     post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # _id 제외
     if not post:
-        return jsonify({"status": "fail", "message": "해당 게시글을 찾을 수 없습니다."}), 404
+        return jsonify({"status": "fail", "message": "해당 게시글을 찾을 수 없습니다."}), 400
     
     # 해당 게시글의 댓글 찾기
     comments = list(db.Comments.find({"postid": postid}, {"_id": 0}))
 
     # 응답 데이터 구성
     response = {
-        "status": "success",
+        "result": "success",
         "message": "게시글과 댓글을 성공적으로 조회했습니다.",
         "data": {
             "post": post,
@@ -162,30 +163,75 @@ def get_post(postid):
         }
     }
 
-    return jsonify(response), 200
+    return jsonify({'result': 'success', 'response' : response}), 200
 
 # 댓글 작성
-@app.route('/comment', methods=['POST'])
-def add_comment():
+@app.route('/post/<postid>/comment', methods=['POST'])
+def add_comment(postid):
     if 'userid' not in session:
-        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'})
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
     
-    postid = request.get("postid")
-    content = request.form("content")
-    author = session['userid']
-    
+    content = request.form.get("content")
+    if not content:
+        return jsonify({'result': 'fail', 'msg': '댓글 내용을 입력해주세요.'}), 400
+
     # 댓글 데이터 생성
     comment = {
         "postid": postid,
-        "content": content,
-        "author": author
+        "content": content
     }
 
     # MongoDB에 댓글 저장
     db.Comments.insert_one(comment)
 
-    return jsonify({"result": "success", "message": "댓글이 작성되었습니다."}), 201
+    return jsonify({"result": "success", "message": "댓글이 작성되었습니다.", 'content' : content}), 200
 
+
+# 마이페이지
+@app.route('/get_mypage', methods=['GET'])
+def get_user_info():
+    if 'userid' not in session:  # 로그인 확인
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    
+    userid = session['userid']  # 세션에서 사용자 ID 가져오기
+    user = db.Users.find_one({"userid": userid}, {"_id": 0, "password": 0})  # 비밀번호 제외
+    
+    if not user:
+        return jsonify({'result': 'fail', 'msg' : '사용자가 없습니다.'}), 404
+    
+    return jsonify({"result": "success", 'user' : user}), 200
+
+# index 화면
+@app.route('/get_index', methods=['GET'])
+def get_user_index():
+    if 'userid' not in session:  # 로그인 확인
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    
+    return jsonify({"result": "success"}), 200
+
+# 회원 탈퇴
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+    if 'userid' not in session:  # 로그인 여부 확인
+        return jsonify({"msg": "로그인이 필요합니다."}), 401
+    
+    userid = session['userid']
+    password = request.json.get("password")  # 프론트에서 입력한 비밀번호 받기
+    
+    # 사용자 정보 조회
+    user = db.Users.find_one({"userid": userid})
+    if not user:
+        return jsonify({"msg": "사용자 정보를 찾을 수 없습니다."}), 404
+
+    # 비밀번호 검증
+    if not bcrypt.checkpw(password.encode('utf-8'), user["password"]):
+        return jsonify({"msg": "비밀번호가 틀렸습니다."}), 400
+
+    # 계정 삭제
+    db.Users.delete_one({"userid": userid})
+    session.clear()  # 세션 삭제 (로그아웃)
+    
+    return jsonify({"msg": "탈퇴되었습니다."}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
