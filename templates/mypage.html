@@ -109,9 +109,8 @@
           data: JSON.stringify({ password: password }),
           success: function (response) {
             if (response.result === "success") {
-              // 서버에서 "로그인이 필요합니다." 메시지를 보낸 경우
               alert(response.msg);
-              window.location.href = "/sign_up";
+              window.location.href = "/login";
               return;
             }
           },
@@ -120,7 +119,7 @@
             if (xhr.status === 401 || xhr.status === 404) {
               // 로그인 필요 또는 유저 정보 없음
               alert(xhr.responseJSON.msg);
-              window.location.href = "/sign_up";
+              window.location.href = "/login";
             } else {
               alert(xhr.responseJSON.msg);
             }
@@ -153,9 +152,9 @@
         >
         <!--정보 수정 페이지 파일로 바꾸기기-->
         <a href="my_posts.html" class="btn btn-secondary w-75"
-          >내 게시물 조회</a
+          >내 게시글 조회</a
         >
-        <!-- 게시물 조회 페이지 파일로 바꾸기-->
+        <!-- 게시글 조회 페이지 파일로 바꾸기-->
         <button class="btn btn-danger w-75" onclick="confirmDelete()">
           회원 탈퇴
         </button>

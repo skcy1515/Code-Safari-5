@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>게시물 수정</title>
+    <title>게시글 수정</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -40,7 +40,7 @@
     </style>
   </head>
   <body>
-    <div class="page-title text-center">게시물 수정</div>
+    <div class="page-title text-center">게시글 수정</div>
 
     <div class="container">
       <form id="editPostForm">
@@ -88,16 +88,15 @@
         });
       });
 
+      // 특정 게시글 조회 (수정할 때)
       function loadPostData() {
         $.ajax({
           url: `/post/editPost/${postid}`,
           type: "GET",
           dataType: "json",
           success: function (response) {
-            console.log(response);
             if (response.result === "success") {
               let post = response.post;
-              console.log(post);
 
               // 기존 데이터 입력
               $("#postid").val(post.postid);
@@ -111,17 +110,27 @@
                   : `<a href="${post.file}" download class="btn btn-sm btn-secondary">첨부 파일 다운로드</a>`;
                 $("#filePreview").html(filePreview);
               }
-            } else {
-              alert("게시글을 불러오는 데 실패했습니다.");
             }
           },
           error: function (xhr) {
-            console.log(xhr.status);
-            alert("게시글을 불러오는 중 오류가 발생했습니다.");
+            if (xhr.status === 401) {
+              // 로그인 안 했을 때
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/login";
+            } else if (xhr.status === 400) {
+              // 게시글이 없을 때
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/";
+            } else if (xhr.status === 403) {
+              // 작성자와 사용자가 다를 때
+              alert(xhr.responseJSON.msg);
+              window.location.href = `/post/${postid}`;
+            }
           },
         });
       }
 
+      // 게시글 수정
       function updatePost() {
         let title = $("#title").val().trim();
         let content = $("#content").val().trim();
@@ -147,14 +156,24 @@
           contentType: false,
           success: function (response) {
             if (response.result === "success") {
-              alert("게시물이 수정되었습니다!");
+              alert(response.msg);
               window.location.href = `/post/${postid}`;
-            } else {
-              alert("수정 실패: " + response.msg);
             }
           },
-          error: function () {
-            alert("게시물 수정 중 오류가 발생했습니다.");
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              // 로그인 안 했을 때
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/login";
+            } else if (xhr.status === 400) {
+              // 게시글이 없을 때
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/";
+            } else if (xhr.status === 403) {
+              // 작성자와 사용자가 다를 때
+              alert(xhr.responseJSON.msg);
+              window.location.href = `/post/${postid}`;
+            }
           },
         });
       }

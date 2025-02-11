@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>게시물 상세</title>
+    <title>게시글 상세</title>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
@@ -69,23 +69,23 @@
     <div class="home-icon" onclick="window.location.href='/'">🏠</div>
     <!--메인페이지 파일로 수정해야 함-->
 
-    <h2 class="post-title text-center">게시물</h2>
+    <h2 class="post-title text-center">게시글</h2>
     <section class="container bg-white p-4 rounded border shadow">
       <div
         class="post-header d-flex justify-content-between align-items-center"
       >
-        <h1 id="postTitle">게시물 제목</h1>
+        <h1 id="postTitle">게시글 제목</h1>
         <!-- 제목 삽입 -->
       </div>
       <hr />
       <div id="fileContainer" class="mt-4"></div>
       <article>
         <p id="postContent">게시글 내용</p>
-        <!-- 게시물 내용 삽입 -->
+        <!-- 게시글 내용 삽입 -->
       </article>
       <footer class="button-group d-flex justify-content-end gap-2 mt-4">
         <button class="btn btn-dark" onclick="redirectToEdit()">수정</button>
-        <!-- 게시물 수정 페이지로 이동 -->
+        <!-- 게시글 수정 페이지로 이동 -->
         <button class="btn btn-danger" onclick="deletePost()">삭제</button>
       </footer>
     </section>
@@ -119,12 +119,12 @@
         window.location.href = `/post/edit/${postid}`;
       }
 
+      // 특정 게시글 조회
       function loadPost() {
         $.ajax({
           url: `/post/view/${postid}`,
           type: "GET",
           success: function (response) {
-            console.log(response);
             if (response["result"] === "success") {
               let post = response.response.data.post;
               let comments = response.response.data.comments;
@@ -159,32 +159,23 @@
               $("#commentList").empty();
               // 개별 댓글 데이터 확인
               comments.forEach((comment) => {
-                console.log(`내용: ${comment.content}`);
-              });
-
-              comments.forEach((comment) => {
-                console.log(comment.content);
                 addCommentToList(comment.content);
               });
-            } else {
-              alert("게시글을 불러오는 데 실패했습니다.");
             }
           },
-          error: function () {
-            alert("게시글을 불러오는 중 오류가 발생했습니다.");
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/login";
+            } else if (xhr.status === 400) {
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/";
+            }
           },
         });
       }
 
-      function addCommentToList(content) {
-        let commentHTML = `
-                <li class="p-2 border-bottom">
-                    <strong>익명</strong>: ${content}
-                </li>
-            `;
-        $("#commentList").append(commentHTML);
-      }
-
+      // 댓글 작성
       function addComment() {
         let commentInput = $("#commentInput").val().trim();
         if (commentInput === "") {
@@ -203,38 +194,60 @@
             if (response.result === "success") {
               addCommentToList(response.content);
               $("#commentInput").val(""); // 입력창 초기화
-            } else {
-              alert("댓글 작성에 실패했습니다.");
             }
           },
-          error: function () {
-            alert("댓글 작성 중 오류가 발생했습니다.");
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/login";
+            }
           },
         });
       }
 
+      // 댓글 HTML 추가
+      function addCommentToList(content) {
+        let commentHTML = `
+                <li class="p-2 border-bottom">
+                    <strong>익명</strong>: ${content}
+                </li>
+            `;
+        $("#commentList").append(commentHTML);
+      }
+
+      // 게시글과 댓글 삭제
       function deletePost() {
-        if (confirm("게시물을 삭제하시겠습니까?")) {
+        if (confirm("게시글을 삭제하시겠습니까?")) {
           $.ajax({
             url: `/post/${postid}`,
             type: "DELETE",
             success: function (response) {
               if (response.result === "success") {
-                alert("게시물과 해당 댓글이 삭제되었습니다.");
+                alert(response.msg);
                 window.location.href = "/"; // 메인 페이지로 이동
-              } else {
-                alert("게시물 삭제에 실패했습니다: " + response.msg);
               }
             },
-            error: function () {
-              alert("게시물 삭제 중 오류가 발생했습니다.");
+            error: function (xhr) {
+              if (xhr.status === 401) {
+                // 로그인 안 했을 때
+                alert(xhr.responseJSON.msg);
+                window.location.href = "/login";
+              } else if (xhr.status === 400) {
+                // 게시글이 없을 때
+                alert(xhr.responseJSON.msg);
+                window.location.href = "/";
+              } else if (xhr.status === 403) {
+                // 작성자와 사용자가 다를 때
+                alert(xhr.responseJSON.msg);
+                window.location.href = `/post/${postid}`;
+              }
             },
           });
         }
       }
 
       function editPost() {
-        window.location.href = `/post/${postid}/edit`; // 수정 페이지로 이동
+        window.location.href = `/post/${postid}/edit`; // 게시글 수정 페이지로 이동
       }
     </script>
 
