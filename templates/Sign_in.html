@@ -36,6 +36,7 @@
         <p id="errorMsg" class="text-red-500 text-sm text-center mb-4 hidden">
           아이디 또는 비밀번호가 일치하지 않습니다.
         </p>
+
         <button
           id="loginBtn"
           type="submit"
@@ -43,13 +44,22 @@
         >
           로그인
         </button>
+        <div class="text-center font-size-14 mt-4 text-gray-500">
+          계정이 없으신가요?
+          <button
+            id="signUpBtn"
+            class="hover:text-blue-700 underline active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-blue-500 px-4 py-2 font-size-14 mt-4text-center"
+          >
+            회원가입하러가기
+          </button>
+        </div>
       </form>
     </div>
-
     <script>
       $(document).ready(function () {
+        // 로그인 폼 제출 이벤트
         $("#loginForm").submit(function (event) {
-          event.preventDefault();
+          event.preventDefault(); // 기본 폼 제출 방지
 
           let userId = $("#id").val().trim();
           let userPw = $("#password").val().trim();
@@ -67,7 +77,7 @@
             data: { userid: userId, password: userPw },
             success: function (response) {
               alert(response.msg);
-              window.location.href = "/"; // 로그인 성공 시 마이페이지로 이동
+              window.location.href = "/"; // 로그인 성공 시 메인 페이지로 이동
             },
             error: function (xhr) {
               let errorMsg = "로그인에 실패했습니다.";
@@ -77,6 +87,12 @@
               $("#errorMsg").text(errorMsg).removeClass("hidden");
             },
           });
+        });
+
+        // 회원가입 버튼 클릭 시 로그인 폼의 유효성 검사 없이 이동
+        $("#signUpBtn").click(function (event) {
+          event.preventDefault(); // 폼 제출 방지 (로그인 유효성 검사 실행 안 됨)
+          window.location.href = "/sign_up";
         });
       });
     </script>
