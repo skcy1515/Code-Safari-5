@@ -29,9 +29,9 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
-      @media screen and (max-width: 767px) {
-        body {
-          font-size: 14px;
+      @media (max-width: 639px) {
+        h1 {
+          font-size: 1.5rem; /* 모바일에서 더 작은 크기 적용 */
         }
       }
     </style>
@@ -39,25 +39,35 @@
 
   <body class="bg-gray-100">
     <header class="bg-white shadow-md p-4 flex flex-col items-center">
-      <h1 class="text-4xl font-bold text-gray-800 text-center">
-        세렝게티 게시판
-      </h1>
+      <div class="flex justify-between items-center w-full p-4">
+        <h1
+          class="text-4xl font-bold text-gray-800 text-center flex-1"
+        >
+          세렝게티 게시판
+        </h1>
+        <button
+          id="logOutBtn"
+          class="hover:text-red-500 active:text-red-700 duration-300 ease-in-out text-black px-4 py-2 font-bold"
+        >
+          로그아웃
+        </button>
+      </div>
+
       <div>
         <button
-        id="myPageBtn"
-        class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center "
-      >
-      마이페이지
-      </button>
-      <button
-      id="addCardBtn"
-      class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center 
-       "
-    >
-    게시물 작성
-    </button>
+          id="myPageBtn"
+          class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center"
+        >
+          마이페이지
+        </button>
+        <button
+          id="addCardBtn"
+          class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center"
+        >
+          게시물 작성
+        </button>
       </div>
-      
+
       <div class="searching flex items-center space-x-2 mt-4">
         <label for="searching" class="font-bold">검색하기</label>
         <input
@@ -68,11 +78,10 @@
         />
         <button
           id="searchBtn"
-          class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400 "
+          class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
         >
           검색
         </button>
-       
       </div>
     </header>
 
@@ -90,7 +99,6 @@
       <!-- 로딩 스피너 -->
       <div id="loading" class="text-center hidden mt-4">
         <span class="text-gray-500">더 불러오는 중...</span>
-        
       </div>
     </section>
 
@@ -104,12 +112,23 @@
           window.location.href = "mypage.html";
         });
       });
-
+      $(document).ready(function () {
+        $("#logOutBtn").click(function () {
+         var ret =confirm("로그아웃 하시겠습니까?");
+         if(ret==true){
+            //여기에 로그아웃 기능 구현하기        
+         }
+         else{
+            return;
+         }
+          
+        });
+      });
       $(document).ready(function () {
         $("#addCardBtn").click(function () {
           window.location.href = "post.html";
         });
-
+      
         //rjatorrlsmd
         //   $("#searchBtn").click(function () {
         //       let searchText = $("#searching").val().toLowerCase();
@@ -118,6 +137,7 @@
         //           $(this).toggle(title.includes(searchText));
         //       });
         //   });
+
         //찬영아 더미 데이터 들어가있는거라 지우고 하면 된다.
         generateDummyData(30);
         loadMoreArticles();
