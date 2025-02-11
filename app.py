@@ -18,7 +18,8 @@ app.secret_key = os.environ.get("SECRET_KEY", "default_secret_key")
 UPLOAD_FOLDER = "./static/uploads"  # 파일을 저장할 경로 변수
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # 파일을 저장할 경로 설정
 
-client = MongoClient("mongodb+srv://skcy151515:IyuTp1jwPnkfLXXl@cluster0.es5up.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tlsAllowInvalidCertificates=true")
+uri = "mongodb+srv://skcy151515:IyuTp1jwPnkfLXXl@cluster0.es5up.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tlsAllowInvalidCertificates=true"
+client = MongoClient(uri, 27017)  # MongoDB는 27017 포트로 돌아갑니다.
 db = client.dbmemo2
 
 # 렌더링 부분
@@ -26,6 +27,7 @@ db = client.dbmemo2
 def sign_up():
     return render_template('sign_up.html')
 
+# 마이페이지로 이동
 @app.route('/mypage')
 def mypage():
     return render_template('mypage.html')
@@ -34,29 +36,24 @@ def mypage():
 def show_login():
     return render_template('sign_in.html')
 
+# URL에서 postid를 받아옴
 @app.route('/post/<postid>')
 def show_post(postid):
-    post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # postid로 게시글 조회
-    if not post:
-        return jsonify({"result": "fail", "msg": "게시글을 찾을 수 없습니다."}), 404
-
-    return render_template('post_show.html', post=post)
+    return render_template('post_show.html')
 
 @app.route('/')
 def show_main():
     return render_template('index.html')
 
+# 게시글 작성 페이지로 이동
 @app.route('/post_write')
 def make_post():
     return render_template('post_write.html')
 
+# 게시글 수정 페이지로 이동
 @app.route('/post/edit/<postid>')
-def edit_post(postid):
-    post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # postid로 게시글 조회
-    if not post:
-        return jsonify({"result": "fail", "msg": "게시글을 찾을 수 없습니다."}), 404
-
-    return render_template('post_edit.html', post=post)
+def edit_post(postid):  
+    return render_template('post_edit.html')
 
 # 회원가입
 @app.route('/sign_up', methods=['POST'])
@@ -69,9 +66,9 @@ def signup():
     
     # 기존 사용자 확인
     if db.Users.find_one({"userid": userid}):
-        return jsonify({"msg": "이미 존재하는 아이디입니다."}), 400
+        return jsonify({"result": "fail", "msg": "이미 존재하는 아이디입니다."}), 400
     if db.Users.find_one({"email" : email}):
-        return jsonify({"msg": "이미 존재하는 이메일입니다."}), 400
+        return jsonify({"result": "fail", "msg": "이미 존재하는 이메일입니다."}), 400
     
     # 비밀번호 해싱 (bcrypt 사용)
     hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -101,7 +98,7 @@ def logout():
     session.pop('userid', None)  # 세션 삭제
     return jsonify({"result": "success", "msg": "로그아웃 되었습니다."}), 200
 
-# 게시물 작성
+# 게시글 작성
 @app.route('/post', methods=['POST'])
 def uploadPost():
     if 'userid' not in session:
@@ -146,7 +143,7 @@ def uploadPost():
     }
     db.Posts.insert_one(formData)
 
-    return jsonify({'result': 'success'}), 200
+    return jsonify({'result': 'success', 'msg': '게시글 작성이 완료됐습니다.'}), 200
     
 # 모든 게시글 목록 조회
 @app.route('/posts', methods=['GET'])
@@ -159,10 +156,11 @@ def get_posts():
 def get_post(postid):
     if 'userid' not in session:
         return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    
     # 게시글 찾기
     post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # _id 제외
     if not post:
-        return jsonify({"status": "fail", "message": "해당 게시글을 찾을 수 없습니다."}), 400
+        return jsonify({"result": "fail", "msg": "해당 게시글을 찾을 수 없습니다."}), 400
     
     # 해당 게시글의 댓글 찾기
     comments = list(db.Comments.find({"postid": postid}, {"_id": 0}))
@@ -170,7 +168,7 @@ def get_post(postid):
     # 응답 데이터 구성
     response = {
         "result": "success",
-        "message": "게시글과 댓글을 성공적으로 조회했습니다.",
+        "msg": "게시글과 댓글을 성공적으로 조회했습니다.",
         "data": {
             "post": post,
             "comments": comments            
@@ -179,21 +177,26 @@ def get_post(postid):
 
     return jsonify({'result': 'success', 'response' : response}), 200
 
-# 특정 게시글 조회 (수정)
+# 특정 게시글 조회 (수정할 때)
 @app.route('/post/editPost/<postid>', methods=['GET'])
 def get_post_edit(postid):
-    print(postid)
     if 'userid' not in session:
         return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    
     # 게시글 찾기
     post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # _id 제외
     if not post:
-        return jsonify({"status": "fail", "message": "해당 게시글을 찾을 수 없습니다."}), 400
+        return jsonify({"result": "fail", "msg": "해당 게시글을 찾을 수 없습니다."}), 400
     
-    # 응답 데이터 수정 (중첩 제거)
+    # 게시글 작성자와 로그인한 사용자가 일치하는지 확인
+    userid = session['userid']
+    if post.get("author") != userid:
+        return jsonify({"result": "fail", "msg": "작성자만 수정할 수 있습니다."}), 403
+    
+    # 응답 데이터 
     return jsonify({
         "result": "success",
-        "message": "게시글을 성공적으로 조회했습니다.",
+        "msg": "게시글을 성공적으로 조회했습니다.",
         "post": post
     }), 200
 
@@ -204,8 +207,6 @@ def add_comment(postid):
         return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
     
     content = request.form.get("content")
-    if not content:
-        return jsonify({'result': 'fail', 'msg': '댓글 내용을 입력해주세요.'}), 400
 
     # 댓글 데이터 생성
     comment = {
@@ -216,7 +217,7 @@ def add_comment(postid):
     # MongoDB에 댓글 저장
     db.Comments.insert_one(comment)
 
-    return jsonify({"result": "success", "message": "댓글이 작성되었습니다.", 'content' : content}), 200
+    return jsonify({"result": "success", "msg": "댓글이 작성되었습니다.", 'content' : content}), 200
 
 
 # 마이페이지
@@ -274,16 +275,25 @@ def delete_post(postid):
     # 게시글 찾기
     post = db.Posts.find_one({"postid": postid})
     if not post:
-        return jsonify({'result': 'fail', 'msg': '게시물을 찾을 수 없습니다.'}), 404
+        return jsonify({'result': 'fail', 'msg': '게시글을 찾을 수 없습니다.'}), 400
+    
+    # 게시글 작성자와 로그인한 사용자가 일치하는지 확인
+    userid = session['userid']
+    if post.get("author") != userid:
+        return jsonify({"result": "fail", "msg": "작성자만 삭제할 수 있습니다."}), 403
     
     # 게시글에 첨부된 파일이 있으면 삭제
-    if post.get("file"):  # 파일이 존재하면
+    file_path = None
+    if post.get("file"):  
         file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(post["file"]))
-        
-    # 파일 존재 여부 확인 후 삭제
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print(f"파일 삭제됨: {file_path}")  # 로그 확인용
+
+    # 파일이 존재할 때만 삭제 실행
+    if file_path and os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+            print(f"파일 삭제됨: {file_path}")  # 로그 확인용
+        except Exception as e:
+            print(f"파일 삭제 중 오류 발생: {e}")  # 예외 처리 추가
 
     # 게시글 삭제
     db.Posts.delete_one({"postid": postid})
@@ -291,15 +301,23 @@ def delete_post(postid):
     # 해당 게시글의 모든 댓글 삭제
     db.Comments.delete_many({"postid": postid})
 
-    return jsonify({'result': 'success', 'msg': '게시물과 댓글이 삭제되었습니다.'}), 200
+    return jsonify({'result': 'success', 'msg': '게시글과 댓글이 삭제되었습니다.'}), 200
 
-# 수정
+# 게시글 수정
 @app.route('/post/<postid>', methods=['PUT'])
 def update_post(postid):
     if 'userid' not in session:
         return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
     
     post = db.Posts.find_one({"postid": postid}, {"_id": 0})  # postid로 게시글 조회
+
+    if not post:
+        return jsonify({"result": "fail", "msg": "해당 게시글을 찾을 수 없습니다."}), 400
+
+    # 게시글 작성자와 로그인한 사용자가 일치하는지 확인
+    userid = session['userid']
+    if post.get("author") != userid:
+        return jsonify({"result": "fail", "msg": "작성자만 수정할 수 있습니다."}), 403
 
     # 요청 데이터 받기
     title = request.form.get("title")
@@ -337,12 +355,11 @@ def update_post(postid):
         update_data["file"] = f"/static/uploads/{filename}"
         update_data["isimage"] = filename.rsplit(".", 1)[-1].lower() in {"png", "jpg", "jpeg", "gif", "webp"}
 
-    # 게시글 수정
     db.Posts.update_one({"postid": postid}, {"$set": update_data})
 
-    return jsonify({'result': 'success', 'msg': '게시물이 수정되었습니다.'}), 200
+    return jsonify({'result': 'success', 'msg': '게시글이 수정되었습니다.'}), 200
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run('0.0.0.0',port=5000, debug=True)
 
