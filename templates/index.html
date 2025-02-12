@@ -10,9 +10,17 @@
     <style>
       html,
       body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
+        height: 100%; /* 화면 전체 높이 적용 */
+        margin: 0; /* 여백 제거 */
+        padding: 0; /* 패딩 제거 */
+      }
+      body {
+        font-family: "S-CoreDream-Medium", sans-serif;
+        background-image: url('{{ url_for("static", filename="my_view,index.png") }}');
+        background-size: cover; /* 배경 이미지를 화면에 맞게 확대/축소 */
+        background-position: center; /* 배경 이미지 중앙 정렬 */
+        background-repeat: no-repeat; /* 배경 반복 제거 */
+        background-attachment: fixed; /* 배경 이미지 고정 */
       }
       /* 게시글 내부에서 스크롤 가능하도록 설정 */
       .section {
@@ -22,13 +30,31 @@
         padding: 24px;
       }
 
+      .card-item {
+        display: flex;
+        flex-direction: column; /* 세로 정렬 */
+        justify-content: space-between; /* 카드 내부 균형 유지 */
+        height: 100%; /* 부모 크기 맞추기 */
+      }
+
+      .card-content {
+        flex-grow: 1; /* 내용이 많아도 균일한 크기 유지 */
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* 🟢 중앙 정렬 */
+        align-items: flex-start; /* 🔵 왼쪽 정렬 */
+      }
+
       /* 6줄까지 표시되도록 설정 */
       .text-preview {
-        display: -webkit-box;
-        -webkit-line-clamp: 6;
-        -webkit-box-orient: vertical;
+        display: block;
         overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4em; /* 줄 간격 */
+        max-height: calc(1.4em * 6); /* 최대 6줄까지 표시 */
+        word-break: break-word; /* 긴 단어 자동 줄바꿈 */
       }
+
       .mypage_location {
         position: absolute;
         top: 10px;
@@ -62,14 +88,6 @@
           format("woff");
         font-weight: 500;
         font-style: normal;
-      }
-
-      body {
-        font-family: "S-CoreDream-Medium", sans-serif;
-        background-image: url('{{ url_for("static", filename="basic_bg.png") }}');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
       }
     </style>
   </head>
@@ -265,7 +283,9 @@
           <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
               ${
                 file && isimage
-                  ? `<img src="${file}" alt="Card Image" class="w-full h-48 object-cover">`
+                  ? `<div class="w-full h-48 overflow-hidden">
+                        <img src="${file}" alt="Card Image" class="w-full h-full object-cover">
+                    </div>`
                   : ""
               }
               <div class="p-4">
@@ -273,7 +293,9 @@
                   <p class="text-gray-700 mt-2 text-preview">${content}</p>
               </div>
           </div>
-          `;
+        `;
+
+
         $("#cardsContainer").append(cardHTML);
       }
 

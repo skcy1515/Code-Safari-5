@@ -9,28 +9,45 @@
       rel="stylesheet"
     />
     <style>
+      html,
+      body {
+        height: 100%; /* 화면 전체 높이 적용 */
+        margin: 0; /* 여백 제거 */
+        padding: 0; /* 패딩 제거 */
+      }
+      body {
+        font-family: "S-CoreDream-Medium", sans-serif;
+        background-image: url('{{ url_for("static", filename="login,signup_bg.png") }}');
+        background-size: cover; /* 배경 이미지를 화면에 맞게 확대/축소 */
+        background-position: center; /* 배경 이미지 중앙 정렬 */
+        background-repeat: no-repeat; /* 배경 반복 제거 */
+        background-attachment: fixed; /* 배경 이미지 고정 */
+      }
       @font-face {
         font-family: "S-CoreDream-5";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff") format("woff");
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff")
+          format("woff");
         font-weight: 500;
       }
 
       @font-face {
         font-family: "S-CoreDream-6";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff") format("woff");
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff")
+          format("woff");
         font-weight: 600;
       }
-  
-  @font-face {
+
+      @font-face {
         font-family: "S-CoreDream-7";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff") format("woff");
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff")
+          format("woff");
         font-weight: 700;
       }
 
       body {
         background-color: #f4f4f4;
         padding: 20px;
-        font-family: "S-CoreDream-5",sans-serif;
+        font-family: "S-CoreDream-5", sans-serif;
       }
       .home-icon {
         position: absolute;
@@ -74,7 +91,7 @@
         margin-bottom: 20px;
         font-weight: bold;
         margin-top: 80px;
-        color: #74D283; 
+        color: #74d283;
         font-family: "S-CoreDream-7", sans-serif;
       }
       .profile-info p {
@@ -93,22 +110,25 @@
         border-radius: 10px;
       }
       .btn-primary {
-        background-color: #72CD89 !important;
-        border-color: #72CD89 !important;
+        background-color: #72cd89 !important;
+        border-color: #72cd89 !important;
       }
       .btn-primary:hover {
-        background-color: #63B474 !important; /* 마우스 올렸을 때 색상 */
-        border-color: #63B474 !important;
+        background-color: #63b474 !important; /* 마우스 올렸을 때 색상 */
+        border-color: #63b474 !important;
       }
       .btn-secondary {
         background-color: #488755 !important;
         border-color: #488755 !important;
       }
       .btn-secondary:hover {
-        background-color: rgb(33, 75, 48)  !important; /* 마우스 올렸을 때 색상 */
+        background-color: rgb(
+          33,
+          75,
+          48
+        ) !important; /* 마우스 올렸을 때 색상 */
         border-color: rgb(33, 75, 48) !important;
       }
-      
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -189,14 +209,17 @@
         <p style="margin-bottom: 200px"></p>
         <button
           onclick="window.location.href='/edit/profile'"
-          class="btn btn-primary w-50 "
+          class="btn btn-primary w-50"
         >
           회원 정보 수정
         </button>
-        <button onclick="window.location.href='/getMyPosts'" class="btn btn-secondary w-50">
+        <button
+          onclick="window.location.href='/getMyPosts'"
+          class="btn btn-secondary w-50"
+        >
           내 게시글 조회
         </button>
-        
+
         <button class="btn btn-danger w-50" onclick="confirmDelete()">
           회원 탈퇴
         </button>
