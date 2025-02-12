@@ -175,7 +175,7 @@
               $("#commentList").empty();
               // 개별 댓글 데이터 확인
               comments.forEach((comment) => {
-                addCommentToList(comment.content);
+                addCommentToList(comment.content, comment.commentid);
               });
             }
           },
@@ -223,10 +223,13 @@
       }
 
       // 댓글 HTML 추가
-      function addCommentToList(content) {
+      function addCommentToList(content, commentid) {
         let commentHTML = `
-                <li class="p-2 border-bottom">
-                    <strong>익명</strong>: ${content}
+                <li class="p-2 border-bottom" data-comment-id="${commentid}">
+                  <span><strong>익명</strong>: ${content}</span>
+                  <button onclick="deleteComment('${commentid}')" class="bg-red-500 px-2 py-1 rounded hover:bg-red-600 transition">
+                  삭제
+                  </button>
                 </li>
             `;
         $("#commentList").append(commentHTML);
@@ -257,6 +260,42 @@
                 // 작성자와 사용자가 다를 때
                 alert(xhr.responseJSON.msg);
                 window.location.href = `/post/${postid}`;
+              }
+            },
+          });
+        }
+      }
+
+      // 댓글 삭제
+      function deleteComment() {
+        let commentid = $("li").data("comment-id");
+        // 현재 페이지 URL에서 postid 추출
+        let postid = window.location.pathname.split("/")[2]; // URL이 "/post/123"일 경우, postid = "123"
+        if (confirm("댓글을 삭제하시겠습니까?")) {
+          $.ajax({
+            url: "/deleteComment",
+            contentType: "application/json", // JSON 요청 설정
+            data: JSON.stringify({ commentid: commentid }), // 요청 본문(Body)에 JSON 데이터 전송
+            type: "DELETE",
+            success: function (response) {
+              if (response.result === "success") {
+                alert(response.msg);
+                window.location.href = `/post/${postid}`;
+              }
+            },
+            error: function (xhr) {
+              if (xhr.status === 401) {
+                // 로그인 안 했을 때
+                alert(xhr.responseJSON.msg);
+                window.location.href = "/login";
+              } else if (xhr.status === 400) {
+                // 댓글이 없을 때
+                alert(xhr.responseJSON.msg);
+                window.location.href = `/post/${postid}`;
+              } else if (xhr.status === 403) {
+                // 작성자와 사용자가 다를 때
+                alert(xhr.responseJSON.msg);
+                return;
               }
             },
           });
