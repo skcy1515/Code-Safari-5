@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename # 파일 이름에 사용할 수 없는 특수 문자를 제거하여 안전한 파일 이름을 생성하는 유틸리티 함수
 from bson.objectid import ObjectId
@@ -70,7 +70,7 @@ def getMyPosts():
 @app.route('/sign_up', methods=['POST'])
 def signup():
     # data: { userid: userid, password: password, name: name, email: email } 형식으로 데이터 불러옴
-    # Get 요청은 args로, Post 요청은 form으로
+    # Get 요청은 args로, Post 요청은 form으로, Delete 요청은 json
     userid = request.form['userid']
     password = request.form['password']
     name = request.form['name']
@@ -218,12 +218,16 @@ def add_comment(postid):
     if 'userid' not in session:
         return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
     
+    userid = session['userid']
+    
     content = request.form.get("content")
 
     # 댓글 데이터 생성
     comment = {
+        'commentid': str(ObjectId()),
         "postid": postid,
-        "content": content
+        "content": content,
+        "author" : userid
     }
 
     # MongoDB에 댓글 저장
@@ -314,6 +318,33 @@ def delete_post(postid):
     db.Comments.delete_many({"postid": postid})
 
     return jsonify({'result': 'success', 'msg': '게시글과 댓글이 삭제되었습니다.'}), 200
+
+# 댓글 삭제
+@app.route('/deleteComment', methods=['DELETE'])
+def delete_comment():
+    if 'userid' not in session:
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    
+    # contentType: "application/json", 요청할 때 contentType 사용
+    # data: JSON.stringify({ commentid: commentid }),
+    data = request.get_json()
+    commentid = data.get("commentid")
+    print(commentid)
+
+    # 댓글 찾기
+    comment = db.Comments.find_one({"commentid": commentid})
+    if not comment:
+        return jsonify({'result': 'fail', 'msg': '댓글을 찾을 수 없습니다.'}), 400
+
+    # 댓글 작성자와 로그인한 사용자가 일치하는지 확인
+    userid = session['userid']
+    if comment.get("author") != userid:
+        return jsonify({"result": "fail", "msg": "작성자만 삭제할 수 있습니다."}), 403
+
+    # 댓글 삭제
+    db.Comments.delete_one({"commentid": commentid})
+
+    return jsonify({'result': 'success', 'msg': '댓글이 삭제되었습니다.'}), 200
 
 # 게시글 수정
 @app.route('/post/<postid>', methods=['PUT'])
@@ -449,6 +480,21 @@ def get_my_posts():
     user_posts = list(db.Posts.find({"author": userid}, {'_id': 0}))  # 해당 사용자의 게시글만 조회
 
     return jsonify({"result": "success", "posts": user_posts}), 200
+
+# 게시글 검색
+@app.route('/keywordPosts', methods=['GET'])
+def get_keyword_posts():
+    if 'userid' not in session:  # 로그인 확인
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+
+    keyword = request.args.get("inputKeyword")
+    # 제목(title)에 키워드가 포함된 게시글 검색 (대소문자 구분 없이)
+    posts = list(db.Posts.find(
+        {"title": {"$regex": keyword, "$options": "i"}},
+        {'_id': 0}
+    ))
+
+    return jsonify({"result": "success", "posts": posts, "keyword" : keyword}), 200
 
 if __name__ == '__main__':
     app.run('0.0.0.0',port=5000, debug=True)
