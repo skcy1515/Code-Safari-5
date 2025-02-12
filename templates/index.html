@@ -48,21 +48,21 @@
           format("woff");
         font-weight: 700;
         font-style: Bold;
-      } 
+      }
       @font-face {
         font-family: "S-CoreDream-Bold2";
         src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff")
           format("woff");
         font-weight: 600;
         font-style: normal;
-      } 
+      }
       @font-face {
         font-family: "S-CoreDream-Medium";
         src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff")
           format("woff");
-        font-weight: 600; 
+        font-weight: 600;
         font-style: normal;
-      } 
+      }
 
       body {
         font-family: "S-CoreDream-Bold", sans-serif;
@@ -101,6 +101,7 @@
         </button>
       </div>
 
+      <div class="searching flex items-center space-x-2 mt-4">
       <div
         class="searching flex items-center justify-center space-x-2 mt-4 border-b-[1.3px] border-[#707070] pb-2 w-full"
       >
@@ -110,6 +111,7 @@
           type="text"
           name="searching"
           class="border border-black p-1 rounded pos w-full sm:w-72 md:w-96 lg:w-[500px] text-black"
+          autocomplete="off"
         />
         <button
           id="searchBtn"
@@ -122,7 +124,7 @@
 
     <section class="section">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">게시물 목록</h2>
+        <h2 class="text-2xl font-bold">게시글 목록</h2>
       </div>
 
       <!-- 카드 컨테이너 -->
@@ -247,6 +249,7 @@
 
         if (currentIndex >= articles.length) {
           $("#loading").hide();
+          $(".section").off("scroll"); // 스크롤 이벤트 제거 (추가 요청 방지)
         }
       }
 

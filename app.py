@@ -23,6 +23,7 @@ client = MongoClient(uri, 27017)  # MongoDB는 27017 포트로 돌아갑니다.
 db = client.dbmemo2
 
 # 렌더링 부분
+
 @app.route('/sign_up')
 def sign_up():
     return render_template('sign_up.html')
@@ -55,10 +56,21 @@ def make_post():
 def edit_post(postid):  
     return render_template('post_edit.html')
 
+# 회원 수정 페이지로 이동
+@app.route('/edit/profile')
+def edit_profile():  
+    return render_template('edit_profile.html')
+
+# 내 게시글 조회 페이지로 이동
+@app.route('/getMyPosts')
+def getMyPosts():  
+    return render_template('view_post.html')
+
 # 회원가입
 @app.route('/sign_up', methods=['POST'])
 def signup():
     # data: { userid: userid, password: password, name: name, email: email } 형식으로 데이터 불러옴
+    # Get 요청은 args로, Post 요청은 form으로
     userid = request.form['userid']
     password = request.form['password']
     name = request.form['name']
@@ -254,17 +266,17 @@ def delete_account():
     # 사용자 정보 조회
     user = db.Users.find_one({"userid": userid})
     if not user:
-        return jsonify({"msg": "사용자 정보를 찾을 수 없습니다."}), 404
+        return jsonify({'result': 'fail', "msg": "사용자 정보를 찾을 수 없습니다."}), 404
 
     # 비밀번호 검증
     if not bcrypt.checkpw(password.encode('utf-8'), user["password"]):
-        return jsonify({"msg": "비밀번호가 틀렸습니다."}), 400
+        return jsonify({'result': 'fail', "msg": "비밀번호가 틀렸습니다."}), 400
 
     # 계정 삭제
     db.Users.delete_one({"userid": userid})
     session.clear()  # 세션 삭제 (로그아웃)
     
-    return jsonify({"msg": "탈퇴되었습니다."}), 200
+    return jsonify({'result': 'success', "msg": "탈퇴되었습니다."}), 200
 
 # 게시글과 댓글 삭제
 @app.route('/post/<postid>', methods=['DELETE'])
@@ -323,6 +335,7 @@ def update_post(postid):
     title = request.form.get("title")
     content = request.form.get("content")
     file = request.files.get("file")
+    file_deleted = request.form.get("fileDeleted") == "true"  # 파일 삭제 여부 확인
 
     update_data = {
         "title": title,
@@ -330,15 +343,20 @@ def update_post(postid):
         "updatedat": datetime.now()
     }
 
-     # 기존 파일 삭제 로직 추가
-    if post.get("file"):  
-        old_file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(post["file"]))
-        try:
-            if os.path.exists(old_file_path):  
-                os.remove(old_file_path)  
-                print(f"기존 파일 삭제됨: {old_file_path}")  
-        except Exception as e:
-            print(f"기존 파일 삭제 중 오류 발생: {e}")  
+    # 기존 파일 삭제 로직 추가 (삭제 요청이 있거나 새 파일이 업로드된 경우)
+    if file_deleted or file: # file: 사용자가 새로운 파일을 업로드했는지 확인하는 변수.
+        if post.get("file"):  # 현재 게시글에 기존 파일이 있는지 확인하는 조건.
+            old_file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(post["file"]))
+            try:
+                if os.path.exists(old_file_path):  
+                    os.remove(old_file_path)  
+                    print(f"기존 파일 삭제됨: {old_file_path}")  
+            except Exception as e:
+                print(f"기존 파일 삭제 중 오류 발생: {e}")  
+
+        # DB에서도 기존 파일 삭제
+        update_data["file"] = None
+        update_data["isimage"] = False
 
     # 파일 업로드 처리
     if file:
@@ -359,6 +377,78 @@ def update_post(postid):
 
     return jsonify({'result': 'success', 'msg': '게시글이 수정되었습니다.'}), 200
 
+# 회원정보 수정
+@app.route('/edit_mypage', methods=['GET'])
+def editProfile():
+    if 'userid' not in session:  # 로그인 확인
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+
+    userid = session['userid']
+    # data: { userid: userid, password: password, name: name, email: email } 형식으로 데이터 불러옴
+    user = db.Users.find_one({"userid": userid}, {"_id": 0, "password" : 0})
+    
+    # 응답 데이터 
+    return jsonify({
+        "result": "success",
+        "user": user
+    }), 200
+
+# 비밀번호 검증
+@app.route('/confirm_pw', methods=['GET'])
+def confirm_password():
+    if 'userid' not in session:
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+
+    userid = session['userid']
+    input_password = request.args.get("password")
+
+    print(input_password)
+
+    # DB에서 유저 정보 조회 (비밀번호 포함)
+    user = db.Users.find_one({"userid": userid}, {"_id": 0})
+
+    if not user or "password" not in user:
+        return jsonify({'result': 'fail', 'msg': '유저 정보를 찾을 수 없습니다.'}), 404
+
+    hashed_password = user["password"]  # DB에서 가져온 해싱된 비밀번호
+
+    # 비밀번호 검증
+    if bcrypt.checkpw(input_password.encode('utf-8'), hashed_password):
+        return jsonify({'result': 'success', 'msg': '비밀번호 확인되었습니다.'}), 200
+    else:
+        return jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'}), 400
+    
+# 비번 수정
+@app.route('/edit_password', methods=['PUT'])
+def editPassword():
+    if 'userid' not in session:  # 로그인 확인
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    
+    input_password = request.form.get("password")
+
+    userid = session['userid']
+    user = db.Users.find_one({"userid": userid}, {"_id": 0})
+
+    if not user:
+        return jsonify({'result': 'fail', 'msg': '유저 정보를 찾을 수 없습니다.'}), 404
+
+    # 비밀번호 해싱 (bcrypt 사용)
+    hashed_pw = bcrypt.hashpw(input_password.encode('utf-8'), bcrypt.gensalt())
+    
+    # 비밀번호 업데이트 (올바른 `update_one` 문법 사용)
+    db.Users.update_one({"userid": userid}, {"$set": {"password": hashed_pw}})
+    return jsonify({"result": "success", "msg": "비밀번호가 바뀌었습니다."}), 200
+
+# 내 게시글 조회
+@app.route('/myposts', methods=['GET'])
+def get_my_posts():
+    if 'userid' not in session:  # 로그인 확인
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+
+    userid = session['userid']  # 세션에서 로그인한 사용자 ID 가져오기
+    user_posts = list(db.Posts.find({"author": userid}, {'_id': 0}))  # 해당 사용자의 게시글만 조회
+
+    return jsonify({"result": "success", "posts": user_posts}), 200
 
 if __name__ == '__main__':
     app.run('0.0.0.0',port=5000, debug=True)

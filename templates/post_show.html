@@ -28,6 +28,20 @@
         border-radius: 5px;
         font-size: 24px;
       }
+      .home-icon2 {
+        position: absolute;
+        top: 20px;
+        right: 80px;
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
+        text-align: center;
+        line-height: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 5px;
+        font-size: 24px;
+      }
       .post-title {
         font-size: 32px;
         font-weight: bold;
@@ -66,6 +80,7 @@
   </head>
   <body>
     <!-- 홈 버튼 -->
+    <div class="home-icon2" onclick="window.location.href='/mypage'">👤</div>
     <div class="home-icon" onclick="window.location.href='/'">🏠</div>
     <!--메인페이지 파일로 수정해야 함-->
 
@@ -100,6 +115,7 @@
             id="commentInput"
             class="form-control comment-input"
             placeholder="댓글 입력"
+            autocomplete="off"
           />
           <button class="btn btn-primary" onclick="addComment()">작성</button>
         </div>
@@ -192,6 +208,7 @@
           },
           success: function (response) {
             if (response.result === "success") {
+              alert(response.msg);
               addCommentToList(response.content);
               $("#commentInput").val(""); // 입력창 초기화
             }

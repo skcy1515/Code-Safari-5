@@ -50,6 +50,7 @@
             class="form-control"
             id="title"
             placeholder="제목을 입력하세요"
+            autocomplete="off"
             required
           />
         </div>
@@ -60,12 +61,18 @@
             id="content"
             rows="6"
             placeholder="내용을 입력하세요"
+            autocomplete="off"
             required
           ></textarea>
         </div>
         <div class="mb-3">
           <label for="file" class="form-label">파일 추가</label>
-          <input class="form-control" type="file" id="file" />
+          <input
+            class="form-control"
+            type="file"
+            id="file"
+            autocomplete="off"
+          />
         </div>
         <div class="btn-container">
           <button
