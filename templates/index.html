@@ -39,50 +39,81 @@
         top: 75px;
         right: 10px;
       }
+      * {
+        color: #72cd89;
+      }
+      @font-face {
+        font-family: "S-CoreDream-Bold";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff")
+          format("woff");
+        font-weight: 700;
+        font-style: Bold;
+      } 
+      @font-face {
+        font-family: "S-CoreDream-Bold2";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff")
+          format("woff");
+        font-weight: 600;
+        font-style: normal;
+      } 
+      @font-face {
+        font-family: "S-CoreDream-Medium";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff")
+          format("woff");
+        font-weight: 600; 
+        font-style: normal;
+      } 
+
+      body {
+        font-family: "S-CoreDream-Bold", sans-serif;
+      }
     </style>
   </head>
 
-  <body class="bg-gray-100">
-    <header class="bg-white shadow-md p-4 flex flex-col items-center">
-      <div class="flex justify-between items-center w-full p-4">
-        <h1 class="text-4xl font-bold text-gray-800 text-center flex-1">
-          세렝게티 게시판
-        </h1>
+  <body class="bg-black">
+    <header class="shadow-md p-4 flex flex-col items-center">
+      <div class="absolute top-4 right-4 py-1">
         <button
           id="logOutBtn"
-          class="hover:text-red-500 active:text-red-700 duration-300 ease-in-out text-black px-4 py-2 font-bold"
+          class="hover:text-red-500 active:text-red-700 duration-300 ease-in-out text-white px-4 py-2 font-bold"
           onclick="logout();"
         >
           로그아웃
         </button>
       </div>
 
-      <div>
+      <div class="w-full flex justify-center">
+        <h1 class="text-4xl font-bold main_color" style="font-family: 'S-CoreDream-Bold2', sans-serif;">코드사파리 게시판</h1>
+      </div>
+
+      <div class="py-4">
         <button
           id="myPageBtn"
-          class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center"
+          class="hover:text-[#72CD89] active:text-[#3A8A58] duration-300 ease-in-out w-full sm:w-auto text-center text-white px-4 py-2 font-bold text-center"
         >
           마이페이지
         </button>
         <button
           id="addCardBtn"
-          class="hover:text-blue-500 active:text-blue-700 duration-300 ease-in-out w-full sm:w-auto text-center text-black px-4 py-2 font-bold 700 text-center"
+          class="hover:text-[#72CD89] active:text-[#3A8A58] duration-300 ease-in-out w-full sm:w-auto text-center text-white px-4 py-2 font-bold text-center"
         >
           게시글 작성
         </button>
       </div>
 
-      <div class="searching flex items-center space-x-2 mt-4">
+      <div
+        class="searching flex items-center justify-center space-x-2 mt-4 border-b-[1.3px] border-[#707070] pb-2 w-full"
+      >
         <label for="searching" class="font-bold">검색하기</label>
         <input
           id="searching"
           type="text"
           name="searching"
-          class="border border-black p-1 rounded pos w-full sm:w-72 md:w-96 lg:w-[500px]"
+          class="border border-black p-1 rounded pos w-full sm:w-72 md:w-96 lg:w-[500px] text-black"
         />
         <button
           id="searchBtn"
-          class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
+          class="bg-[#72CD89] px-3 py-1 rounded hover:bg-[#5DBA76] active:bg-[#4CA969] font-bold text-white"
         >
           검색
         </button>
@@ -91,7 +122,7 @@
 
     <section class="section">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">게시글 목록</h2>
+        <h2 class="text-2xl font-bold">게시물 목록</h2>
       </div>
 
       <!-- 카드 컨테이너 -->
