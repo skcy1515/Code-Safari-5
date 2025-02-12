@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename # 파일 이름에 사용할 수 없는 특수 문자를 제거하여 안전한 파일 이름을 생성하는 유틸리티 함수
 from bson.objectid import ObjectId
@@ -449,6 +449,21 @@ def get_my_posts():
     user_posts = list(db.Posts.find({"author": userid}, {'_id': 0}))  # 해당 사용자의 게시글만 조회
 
     return jsonify({"result": "success", "posts": user_posts}), 200
+
+# 게시글 검색
+@app.route('/keywordPosts', methods=['GET'])
+def get_keyword_posts():
+    if 'userid' not in session:  # 로그인 확인
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+
+    keyword = request.args.get("inputKeyword")
+    # 제목(title)에 키워드가 포함된 게시글 검색 (대소문자 구분 없이)
+    posts = list(db.Posts.find(
+        {"title": {"$regex": keyword, "$options": "i"}},
+        {'_id': 0}
+    ))
+
+    return jsonify({"result": "success", "posts": posts, "keyword" : keyword}), 200
 
 if __name__ == '__main__':
     app.run('0.0.0.0',port=5000, debug=True)
