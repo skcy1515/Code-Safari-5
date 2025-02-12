@@ -11,9 +11,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+      @font-face {
+        font-family: "S-CoreDream-4";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-4Regular.woff") format("woff");
+        font-weight: 400;
+      }
+
+      @font-face {
+        font-family: "S-CoreDream-6";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff") format("woff");
+        font-weight: 600;
+      }
+
       body {
         background-color: #f4f4f4;
         padding: 20px;
+        font-family: "S-CoreDream-4", sans-serif;
       }
       .home-icon {
         position: absolute;
@@ -71,6 +84,8 @@
         margin-bottom: 20px;
         font-weight: bold;
         margin-top: 80px;
+        font-family: "S-CoreDream-6", sans-serif;
+        color : #74D283;
       }
       .profile-info p {
         font-size: 1.5rem;
@@ -78,10 +93,15 @@
       .btn {
         font-size: 1.25rem;
         padding: 15px 30px;
+        
       }
       .btn-danger {
         font-size: 1.25rem;
         padding: 15px 30px;
+      }
+      .user-name .user-id{
+        font-family: "S-CoreDream-3", sans-serif;;
+
       }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -218,7 +238,10 @@
         <button
           type="submit"
           id="confirm_pw"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          class="text-white px-4 py-2 rounded-lg"
+          style="background-color: rgb(116,205,137) !important; border: none;"
+          onmouseover="this.style.backgroundColor='rgb(101, 175, 118)';"
+          onmouseout="this.style.backgroundColor='rgb(116,205,137)';"
           onclick="confirmPw()"
         >
           비밀번호 확인
@@ -242,7 +265,10 @@
         <button
           type="submit"
           id="change_pw"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          class="text-white px-4 py-2 rounded-lg"
+          style="background-color: rgb(116,205,137) !important; border: none;"
+          onmouseover="this.style.backgroundColor='rgb(101, 175, 118)';"
+          onmouseout="this.style.backgroundColor='rgb(116,205,137)';"
           onclick="checkForm(event)"
         >
           비밀번호 변경

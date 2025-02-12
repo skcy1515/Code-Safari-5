@@ -67,6 +67,13 @@
         font-size: 1.25rem;
         padding: 15px 30px;
       }
+      .custom-btn {
+        border-radius: 8px; /* 모서리 둥글게 */
+        padding: 12px 24px; /* 버튼 안쪽 여백 */
+        font-size: 1.25rem; /* 글자 크기 */
+        border: none; /* 테두리 제거 */
+      }
+      
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -145,22 +152,19 @@
         class="mt-auto d-flex flex-column justify-content-center align-items-center gap-3"
       >
         <p style="margin-bottom: 200px"></p>
-        <button
-          onclick="window.location.href='/edit/profile'"
-          class="btn btn-primary w-75"
-        >
+        <button onclick="window.location.href='/edit/profile'" class="btn w-75 custom-btn">
           회원 정보 수정
         </button>
-        <!--정보 수정 페이지 파일로 바꾸기기-->
-        <a
-          onclick="window.location.href='/getMyPosts'"
-          class="btn btn-secondary w-75"
-          >내 게시글 조회</a
-        >
-        <!-- 게시글 조회 페이지 파일로 바꾸기-->
-        <button class="btn btn-danger w-75" onclick="confirmDelete()">
+        
+        <a onclick="window.location.href='/getMyPosts'" class="btn w-75 custom-btn">
+          내 게시글 조회
+        </a>
+        
+        <button class="btn w-75 custom-btn" onclick="confirmDelete()">
           회원 탈퇴
         </button>
+        
+      
         <!--탈퇴 -->
       </div>
     </div>
