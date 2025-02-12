@@ -9,9 +9,19 @@
       rel="stylesheet"
     />
     <style>
+      html,
       body {
-        background-color: #f4f4f4;
-        padding: 20px;
+        height: 100%; /* 화면 전체 높이 적용 */
+        margin: 0; /* 여백 제거 */
+        padding: 0; /* 패딩 제거 */
+      }
+      body {
+        font-family: "S-CoreDream-6";
+        background-image: url('{{ url_for("static", filename="post.png") }}');
+        background-size: cover; /* 배경 이미지를 화면에 맞게 확대/축소 */
+        background-position: center; /* 배경 이미지 중앙 정렬 */
+        background-repeat: no-repeat; /* 배경 반복 제거 */
+        background-attachment: fixed; /* 배경 이미지 고정 */
       }
       .page-title {
         font-size: 32px;

@@ -157,6 +157,21 @@ def uploadPost():
 
     return jsonify({'result': 'success', 'msg': '게시글 작성이 완료됐습니다.'}), 200
     
+# 게시글 좋아요
+@app.route('/post/like/<postid>', methods=['POST'])
+def likePost(postid):
+    if 'userid' not in session:
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+    post = db.Posts.find_one({'postid': postid})
+    if not post:
+        return jsonify({'result': 'fail', 'msg': '게시글을 찾을 수 없습니다.'}), 400
+
+    updated_likes = post.get('likes', 0) + 1  # 기존 좋아요 값에 1 추가
+
+    db.Posts.update_one({'postid': postid}, {'$set': {'likes': updated_likes}})
+
+    return jsonify({'result': 'success', 'likes': updated_likes}), 200
+
 # 모든 게시글 목록 조회
 @app.route('/posts', methods=['GET'])
 def get_posts():
@@ -183,7 +198,7 @@ def get_post(postid):
         "msg": "게시글과 댓글을 성공적으로 조회했습니다.",
         "data": {
             "post": post,
-            "comments": comments            
+            "comments": comments     
         }
     }
 
@@ -329,7 +344,6 @@ def delete_comment():
     # data: JSON.stringify({ commentid: commentid }),
     data = request.get_json()
     commentid = data.get("commentid")
-    print(commentid)
 
     # 댓글 찾기
     comment = db.Comments.find_one({"commentid": commentid})
