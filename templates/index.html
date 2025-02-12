@@ -41,8 +41,8 @@
         flex-grow: 1; /* 내용이 많아도 균일한 크기 유지 */
         display: flex;
         flex-direction: column;
-        justify-content: center; /* 🟢 중앙 정렬 */
-        align-items: flex-start; /* 🔵 왼쪽 정렬 */
+        justify-content: center; 
+        align-items: flex-start; 
       }
 
       /* 6줄까지 표시되도록 설정 */
@@ -97,7 +97,7 @@
       <div class="absolute top-4 right-4 py-1">
         <button
           id="logOutBtn"
-          class="hover:text-red-500 active:text-red-700 duration-300 ease-in-out text-white px-4 py-2 font-bold"
+          class="hover:text-red-500 active:text-red-700 duration-300 ease-in-out text-white px-4 py-2 font-bold text-lg"
           onclick="logout();"
         >
           로그아웃
@@ -105,19 +105,19 @@
       </div>
 
       <div class="w-full flex justify-center">
-        <h1 class="text-4xl font-bold main_color" style="font-family: 'S-CoreDream-Bold2', sans-serif;">코드사파리 게시판</h1>
+        <h1 class="pt-8 text-5xl font-bold main_color" style="font-family: 'S-CoreDream-Bold2', sans-serif;">코드사파리 게시판</h1>
       </div>
 
       <div class="py-4">
         <button
           id="myPageBtn"
-          class="hover:text-[#72CD89] active:text-[#3A8A58] duration-300 ease-in-out w-full sm:w-auto text-center text-white px-4 py-2 font-bold text-center"
+          class="hover:text-[#72CD89] active:text-[#3A8A58] duration-300 ease-in-out w-full sm:w-auto text-center text-white px-4 py-2 font-bold text-center text-xl"
         >
           마이페이지
         </button>
         <button
           id="addCardBtn"
-          class="hover:text-[#72CD89] active:text-[#3A8A58] duration-300 ease-in-out w-full sm:w-auto text-center text-white px-4 py-2 font-bold text-center"
+          class="hover:text-[#72CD89] active:text-[#3A8A58] duration-300 ease-in-out w-full sm:w-auto text-center text-white px-4 py-2 font-bold text-center text-xl"
         >
           게시글 작성
         </button>
@@ -127,7 +127,7 @@
       <div
         class="searching flex items-center justify-center space-x-2 mt-4 border-b-[1.3px] border-[#707070] pb-2 w-full"
       >
-        <label for="searching" class="font-bold">검색하기</label>
+        <label for="searching" class="font-bold text-lg">검색하기</label>
         <input
           id="searching"
           type="text"
@@ -142,12 +142,19 @@
         >
           검색
         </button>
+        <button
+          id="likes"
+          class="px-4 py-1 hover:text-[#72CD89] active:text-[#3A8A58] duration-300 ease-in-out w-full sm:w-auto text-center text-white px-4 py-2 font-bold text-center text-xl"
+          onclick="searchKeyword()"
+        >
+          ❤️ 정렬
+        </button>
       </div>
     </header>
 
     <section class="section">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">게시글 목록</h2>
+        <h2 class="text-2xl font-bold text-3xl">게시글 목록</h2>
       </div>
 
       <!-- 카드 컨테이너 -->
