@@ -29,10 +29,19 @@
           format("woff");
         font-weight: 400;
       }
-
+      html,
       body {
-        font-family: "S-CoreDream-6", sans-serif;
-        background-color: #f8f9fa;
+        height: 100%; /* 화면 전체 높이 적용 */
+        margin: 0; /* 여백 제거 */
+        padding: 0; /* 패딩 제거 */
+      }
+      body {
+        font-family: "S-CoreDream-6";
+        background-image: url('{{ url_for("static", filename="login,signup_bg.png") }}');
+        background-size: cover; /* 배경 이미지를 화면에 맞게 확대/축소 */
+        background-position: center; /* 배경 이미지 중앙 정렬 */
+        background-repeat: no-repeat; /* 배경 반복 제거 */
+        background-attachment: fixed; /* 배경 이미지 고정 */
       }
 
       .card {
@@ -46,7 +55,7 @@
       .btn,
       .text-link,
       .text-danger {
-        font-family: "S-CoreDream-3", sans-serif;
+        font-family: "S-CoreDream-3";
       }
 
       h2 {
@@ -75,7 +84,7 @@
       .text-link {
         color: #3578e5;
         text-decoration: none;
-        //font-weight: bold;
+        font-weight: bold;
       }
 
       .text-link:hover {
