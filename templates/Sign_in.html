@@ -28,17 +28,16 @@
         font-weight: 600;
         font-style: normal;
       }
-
       body {
         font-family: "S-CoreDream-Medium", sans-serif;
-        background-image: url("{{ url_for('static', filename='basic_bg.png') }}"); /* Flask에서 이미지 불러오기 */
+        background-image: url('{{ url_for("static", filename="basic_bg.png") }}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
       }
     </style>
   </head>
-  <body class="flex justify-center items-center min-h-screen h-screen w-full bg-cover bg-center" style="background-image: url('/img/basic_bg.png');">
+  <body class="bg-black flex justify-center items-center min-h-screen">
     <div class="bg-white p-8 rounded-[10px] shadow-lg w-96">
       <h2 class="text-2xl font-bold text-center text-gray-800 mb-6" style="font-family:'S-CoreDream-Bold2'">로그인</h2>
       <form id="loginForm">
@@ -69,7 +68,7 @@
         <button
           id="loginBtn"
           type="submit"
-          class="w-full bg-[#72cd89] text-white py-2 rounded-lg hover:bg-[#5DBA76] active:bg-[#4CA969] transition"
+          class="w-full bg-[#90daa8] text-white py-2 rounded-lg hover:bg-[#5DBA76] active:bg-[#4CA969] transition"
         >
           로그인
         </button>
