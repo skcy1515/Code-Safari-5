@@ -69,7 +69,7 @@
       }
       .card {
         width: 100%;
-        max-width: 1300px;
+        max-width: 1000px;
         margin: 40px auto;
         padding: 60px;
         display: flex;
@@ -80,7 +80,7 @@
 
       .page-title {
         text-align: center;
-        font-size: 2.5rem;
+        font-size: 3rem;
         margin-bottom: 20px;
         font-weight: bold;
         margin-top: 80px;
@@ -224,49 +224,59 @@
           <p><strong>아이디:</strong> <span id="user-id">로딩 중...</span></p>
         </div>
       </div>
-      <div
-        class="mt-auto d-flex flex-column justify-content-center align-items-center gap-3"
-      >
-        <label for="passwordNow">현재 비밀번호</label>
-        <input
-          type="password"
-          id="passwordNow"
-          name="passwordNow"
-          autocomplete="off"
-          class="form-control"
-        />
-        <button
+      <div class="mt-auto d-flex flex-column justify-content-center align-items-center gap-3">
+  
+        <label for="passwordNow" class="fw-medium text-dark">현재 비밀번호</label>
+      
+        <div class="d-flex align-items-center gap-2 w-75 w-md-50 w-lg-25">
+          <input
+            type="password"
+            id="passwordNow"
+            name="passwordNow"
+            autocomplete="off"
+            class="form-control flex-grow-1"
+            placeholder="현재 비밀번호"
+          />
+          <button
           type="submit"
-          id="confirm_pw"
-          class="text-white px-4 py-2 rounded-lg"
-          style="background-color: rgb(116,205,137) !important; border: none;"
+          id="change_pw"
+          class="text-white px-4 py-2 rounded border-0  w-md-50 w-lg-25"
+          style="background-color: rgb(116,205,137); white-space: nowrap;"
           onmouseover="this.style.backgroundColor='rgb(101, 175, 118)';"
           onmouseout="this.style.backgroundColor='rgb(116,205,137)';"
-          onclick="confirmPw()"
+          onclick="checkForm(event)"
         >
           비밀번호 확인
         </button>
-        <label for="newPW">새 비밀번호</label>
+        </div>
+      
+        <div class="mt-2"></div> 
+      
+        <label for="newPW" class="fw-medium text-dark">새 비밀번호</label>
         <input
           type="password"
           id="newPW"
           name="newPW"
-          class="form-control"
           autocomplete="off"
+          class="form-control w-75 w-md-50 w-lg-25"
+          placeholder="새 비밀번호"
         />
-        <label for="confirmNewPW">새 비밀번호 확인</label>
+      
+        <label for="confirmNewPW" class="fw-medium text-dark">새 비밀번호 확인</label>
         <input
           type="password"
           id="confirmNewPW"
           name="confirmNewPW"
           autocomplete="off"
-          class="form-control"
+          class="form-control w-75 w-md-50 w-lg-25"
+          placeholder="새 비밀번호 확인"
         />
+      
         <button
           type="submit"
           id="change_pw"
-          class="text-white px-4 py-2 rounded-lg"
-          style="background-color: rgb(116,205,137) !important; border: none;"
+          class="text-white px-4 py-2 rounded-lg border-0"
+          style="background-color: rgb(116,205,137);"
           onmouseover="this.style.backgroundColor='rgb(101, 175, 118)';"
           onmouseout="this.style.backgroundColor='rgb(116,205,137)';"
           onclick="checkForm(event)"

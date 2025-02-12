@@ -10,9 +10,34 @@
       rel="stylesheet"
     />
     <style>
+      @font-face {
+        font-family: "S-CoreDream-4";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-4Regular.woff") format("woff");
+        font-weight: 400;
+      }
+
+      @font-face {
+        font-family: "S-CoreDream-5";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff") format("woff");
+        font-weight: 500;
+      }
+
+      @font-face {
+        font-family: "S-CoreDream-6";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff") format("woff");
+        font-weight: 600;
+      }
+  
+      @font-face {
+        font-family: "S-CoreDream-8";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff") format("woff");
+        font-weight: 800;
+      }
       body {
         background-color: #f4f4f4;
         padding: 20px;
+        font-family: "S-CoreDream-5";
+        
       }
       .home-icon {
         position: absolute;
@@ -43,10 +68,13 @@
         font-size: 24px;
       }
       .post-title {
-        font-size: 32px;
+        padding-bottom:20px;
+        font-size: 57px;
         font-weight: bold;
         margin-bottom: 20px;
         margin-top: 60px;
+        font-family: "S-CoreDream-8";
+        color : #74D283;
       }
       .comment-container {
         margin-top: 30px;
@@ -76,6 +104,14 @@
       .btn {
         white-space: nowrap;
       }
+      .btn-primary {
+        background-color: #72CD89 !important;
+        border-color: #72CD89 !important;
+      }
+      .btn-primary:hover {
+        background-color: #63B474 !important; /* 마우스 올렸을 때 색상 */
+        border-color: #63B474 !important;
+      }
     </style>
   </head>
   <body>
@@ -84,12 +120,12 @@
     <div class="home-icon" onclick="window.location.href='/'">🏠</div>
     <!--메인페이지 파일로 수정해야 함-->
 
-    <h2 class="post-title text-center">게시글</h2>
+    <h1 class="post-title text-center">게시글</h1>
     <section class="container bg-white p-4 rounded border shadow">
       <div
         class="post-header d-flex justify-content-between align-items-center"
       >
-        <h1 id="postTitle">게시글 제목</h1>
+        <h2 id="postTitle">게시글 제목</h2>
         <!-- 제목 삽입 -->
       </div>
       <hr />
