@@ -10,34 +10,38 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+      html,
+      body {
+        height: 100%; /* 화면 전체 높이 적용 */
+        margin: 0; /* 여백 제거 */
+        padding: 0; /* 패딩 제거 */
+      }
       @font-face {
         font-family: "S-CoreDream-5";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff") format("woff");
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff")
+          format("woff");
         font-weight: 500;
       }
 
       @font-face {
         font-family: "S-CoreDream-6";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff") format("woff");
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff")
+          format("woff");
         font-weight: 600;
       }
-  
+
       @font-face {
         font-family: "S-CoreDream-7";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff") format("woff");
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff")
+          format("woff");
         font-weight: 700;
       }
-  
+
       @font-face {
         font-family: "S-CoreDream-8";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff") format("woff");
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff")
+          format("woff");
         font-weight: 800;
-      }
-  
-      html,body {
-        height: 100%; /* 화면 전체 높이 적용 */
-        margin: 0; /* 여백 제거 */
-        padding: 0; /* 패딩 제거 */
       }
       body {
         font-family: "S-CoreDream-8";
@@ -100,7 +104,7 @@
   </head>
   <body>
     <div class="page-title text-5xl pb-4">내 게시글 조회</div>
-    <div class="home-icon2" onclick="window.location.href='/mypage'">👤</div>
+    <div class="home-icon2" onclick="window.location.href='/mypage'">📜</div>
     <div class="home-icon" onclick="window.location.href='/'">🏠</div>
     <div class="container mt-4">
       <ul id="postList" class="list-unstyled"></ul>

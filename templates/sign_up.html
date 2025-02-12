@@ -100,21 +100,13 @@
         font-weight: 400;
         text-align: center;
       }
-      label.fw-light {
-        font-weight: 300; /* 얇은 글꼴 */
-      }
-      .common-button {
-        font-size: 18px; /* 동일한 폰트 크기 */
-        font-weight: 600; /* 동일한 폰트 두께 */
-      }
-      
     </style>
     <title>회원 가입</title>
   </head>
   <body class="d-flex justify-content-center align-items-center vh-100">
     <div class="container d-flex justify-content-center">
       <div class="card shadow bg-white">
-        <h2 class="text-center fs-2 mb-4">회원가입</h2>
+        <h2 class="text-center mb-4">회원가입</h2>
         <form id="signup-form">
           <div class="mb-3">
             <label for="name" class="form-label">이름</label>
@@ -157,9 +149,11 @@
             />
           </div>
           <div class="mb-3">
-            <label for="confirm-password" class="form-label fw-light">
-              비밀번호 확인
-            </label>
+            <label
+              for="confirm-password"
+              class="block text-gray-700 font-medium"
+              >비밀번호 확인</label
+            >
             <input
               type="password"
               id="confirm-password"
@@ -167,8 +161,6 @@
               class="form-control"
               autocomplete="off"
             />
-          </div>
-          <div class="common-button pb-2">
             <button
               type="button"
               class="w-full mt-3 px-4 py-2 text-gray-700 border border-gray-400 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition"
@@ -176,17 +168,16 @@
             >
               비밀번호 확인
             </button>
+
             <p id="message" class="text-danger text-center"></p>
           </div>
-          <div class="common-button"> 
           <button
             type="submit"
-            class="btn btn-primary w-100 font-bold"
+            class="btn btn-primary w-100"
             onclick="checkForm(event)"
           >
             회원가입 완료
           </button>
-        </div>
           <p class="text-center mt-3">
             계정이 있으신가요? <a href="/login" class="text-link">로그인하기</a>
           </p>
