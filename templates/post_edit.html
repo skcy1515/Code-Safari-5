@@ -37,6 +37,9 @@
         justify-content: flex-end;
         gap: 10px;
       }
+      .delete_button {
+        margin-top: 20px;
+      }
     </style>
   </head>
   <body>
@@ -47,7 +50,13 @@
         <input type="hidden" id="postid" />
         <div class="mb-3">
           <label for="title" class="form-label">제목</label>
-          <input type="text" class="form-control" id="title" required />
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            required
+            autocomplete="off"
+          />
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">내용</label>
@@ -56,11 +65,17 @@
             id="content"
             rows="6"
             required
+            autocomplete="off"
           ></textarea>
         </div>
         <div class="mb-3">
           <label for="file" class="form-label">파일 추가</label>
-          <input class="form-control" type="file" id="file" />
+          <input
+            class="form-control"
+            type="file"
+            id="file"
+            autocomplete="off"
+          />
           <div id="filePreview" class="mt-2"></div>
         </div>
         <div class="btn-container">
@@ -78,6 +93,7 @@
 
     <script>
       let postid = window.location.pathname.split("/").pop(); // URL에서 postid 추출
+      let isFileDeleted = false; // 파일 삭제 여부
 
       $(document).ready(function () {
         loadPostData(); // 기존 게시글 데이터 불러오기
@@ -87,6 +103,15 @@
           updatePost(); // 게시글 수정 요청
         });
       });
+
+      // 파일 삭제 버튼 클릭 시
+      function deleteFile() {
+        $("#filePreview").html(
+          "<p class='text-gray-500'>첨부된 파일이 삭제되었습니다.</p>"
+        );
+        $("#file").val(""); // 파일 입력 필드 초기화
+        isFileDeleted = true; // 파일 삭제 플래그 설정
+      }
 
       // 특정 게시글 조회 (수정할 때)
       function loadPostData() {
@@ -108,6 +133,8 @@
                 let filePreview = post.isimage
                   ? `<img src="${post.file}" alt="첨부 이미지" class="w-50 rounded-lg shadow">`
                   : `<a href="${post.file}" download class="btn btn-sm btn-secondary">첨부 파일 다운로드</a>`;
+
+                filePreview += `<div class="delete_button"><button onclick="deleteFile()" class="btn btn-sm btn-danger ml-2">파일 삭제</button></div>`;
                 $("#filePreview").html(filePreview);
               }
             }
@@ -144,6 +171,7 @@
         let formData = new FormData();
         formData.append("title", title);
         formData.append("content", content);
+        formData.append("fileDeleted", isFileDeleted); // 파일 삭제 여부 전달
         if (file) {
           formData.append("file", file);
         }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>내 게시물 조회</title>
+    <title>내 게시글 조회</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -12,6 +12,34 @@
       body {
         background-color: #f4f4f4;
         padding: 20px;
+      }
+      .home-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
+        text-align: center;
+        line-height: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 5px;
+        font-size: 24px;
+      }
+      .home-icon2 {
+        position: absolute;
+        top: 20px;
+        right: 80px;
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
+        text-align: center;
+        line-height: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 5px;
+        font-size: 24px;
       }
       .page-title {
         text-align: center;
@@ -36,39 +64,55 @@
     </style>
   </head>
   <body>
-    <div class="page-title">내 게시물 조회</div>
+    <div class="page-title">내 게시글 조회</div>
+    <div class="home-icon2" onclick="window.location.href='/mypage'">👤</div>
+    <div class="home-icon" onclick="window.location.href='/'">🏠</div>
     <div class="container mt-4">
       <ul id="postList" class="list-unstyled"></ul>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       $(document).ready(function () {
-        //더미데이터 부분분
-        generateDummyData(20);
         loadMyPosts();
       });
 
-      let articles = [];
-
-
-      function generateDummyData(count) {
-        for (let i = 0; i < count; i++) {
-          articles.push({
-            title: `게시물 제목 ${i + 1}`,
-          });
-        }
-      }
-
+      // 내 게시글 조회
       function loadMyPosts() {
         let postList = $("#postList");
         postList.empty();
-        articles.forEach((post, index) => {
-          postList.append(
-            //DB 연결
-            `<li class="post-item" onclick="location.href='/post/view/${index + 1}'"
+
+        $.ajax({
+          url: "/myposts", // 로그인한 사용자의 게시글만 조회하는 API
+          type: "GET",
+          dataType: "json",
+          success: function (response) {
+            if (response.result === "success") {
+              let posts = response.posts;
+
+              if (posts.length === 0) {
+                postList.append(
+                  "<li class='text-gray-500'>작성한 게시글이 없습니다.</li>"
+                );
+                return;
+              }
+
+              posts.forEach((post) => {
+                postList.append(
+                  `<li class="post-item" onclick="location.href='/post/${post.postid}'">
               <strong>${post.title}</strong>
             </li>`
-          );
+                );
+              });
+            }
+          },
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/login"; // 로그인 필요
+            } else {
+              alert("게시글을 불러오는 중 오류가 발생했습니다.");
+            }
+          },
         });
       }
     </script>

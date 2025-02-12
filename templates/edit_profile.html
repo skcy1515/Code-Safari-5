@@ -29,6 +29,20 @@
         border-radius: 5px;
         font-size: 24px;
       }
+      .home-icon2 {
+        position: absolute;
+        top: 20px;
+        right: 80px;
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
+        text-align: center;
+        line-height: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 5px;
+        font-size: 24px;
+      }
       .profile-container {
         display: flex;
         align-items: center;
@@ -72,16 +86,19 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+      $(document).ready(function () {
+        showMyPage(); // 회원정보
+      });
       let passwordCheck = false; // 비밀번호 확인 버튼이 눌렸는지 여부
       let passwordMatch = false; // 비밀번호가 일치하는지 여부
 
+      // # 회원정보 수정
       function showMyPage() {
         $.ajax({
-          url: "/get_mypage",
+          url: "/edit_mypage",
           type: "GET",
           dataType: "json",
           success: function (response) {
-            console.log("AJAX 응답:", response);
             if (response.result === "success") {
               $("#user-name").text(response.user.name);
               $("#user-id").text(response.user.userid);
@@ -91,7 +108,7 @@
             if (xhr.status === 401 || xhr.status === 404) {
               // 로그인 필요 또는 유저 정보 없음
               alert(xhr.responseJSON.msg);
-              window.location.href = "/sign_up";
+              window.location.href = "/login";
             } else {
               alert(xhr.responseJSON.msg);
             }
@@ -99,6 +116,7 @@
         });
       }
 
+      // 비밀번호 검증
       function confirmPw() {
         let passwordNow = $("#passwordNow").val().trim();
         if (passwordNow === "") {
@@ -114,35 +132,23 @@
           },
           success: function (response) {
             if (response.result === "success") {
-              alert("비밀번호가 확인되었습니다.");
+              alert(response.msg);
               passwordCheck = true; // 비밀번호 확인 완료
-            } else {
-              alert("비밀번호가 일치하지 않습니다.");
-              passwordCheck = false;
             }
           },
-          error: function () {
-            alert("오류가 발생했습니다. 다시 시도해주세요.");
+          error: function (xhr) {
+            if (xhr.status === 401 || xhr.status === 404) {
+              // 로그인 필요 또는 유저 정보 없음
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/login";
+            } else if (xhr.status === 400) {
+              alert(xhr.responseJSON.msg);
+            }
           },
         });
       }
 
-      function checkPassword() {
-        const password = document.getElementById("newPW").value;
-        const confirmPassword = document.getElementById("confirmNewPW").value;
-        const message = document.getElementById("message");
-
-        if (password === confirmPassword && password !== "") {
-          message.textContent = "비밀번호가 일치합니다.";
-          message.className = "message success";
-          passwordMatch = true;
-        } else {
-          message.textContent = "비밀번호가 일치하지 않습니다.";
-          message.className = "message error";
-          passwordMatch = false;
-        }
-      }
-
+      // 비번 수정
       function checkForm(event) {
         event.preventDefault(); // 기본 폼 제출 방지 (페이지 새로고침 방지)
 
@@ -161,35 +167,29 @@
           return false;
         }
 
-        // 새 비밀번호 확인 여부 검사
-        if (!passwordMatch) {
-          alert("새 비밀번호가 일치하지 않습니다.");
-          return false;
-        }
-
         $.ajax({
           type: "PUT",
-          url: "/update_password",
-          contentType: "application/json",
-          data: JSON.stringify({
-            password: password,
-          }),
+          url: "/edit_password",
+          data: { password: password },
           success: function (response) {
             if (response.result === "success") {
-              alert("비밀번호가 변경되었습니다.");
-              window.location.href = "/sign_up";
-            } else {
-              alert("비밀번호 변경에 실패했습니다.");
+              alert(response.msg);
+              window.location.href = "/mypage";
             }
           },
-          error: function () {
-            alert("서버 오류가 발생했습니다.");
+          error: function (xhr) {
+            if (xhr.status === 401 || xhr.status === 404) {
+              // 로그인 필요 또는 유저 정보 없음
+              alert(xhr.responseJSON.msg);
+              window.location.href = "/login";
+            }
           },
         });
       }
     </script>
   </head>
   <body>
+    <div class="home-icon2" onclick="window.location.href='/mypage'">👤</div>
     <div class="home-icon" onclick="window.location.href='/'">🏠</div>
     <div class="page-title">회원정보 수정</div>
     <div class="card">
@@ -212,23 +212,31 @@
           type="password"
           id="passwordNow"
           name="passwordNow"
+          autocomplete="off"
           class="form-control"
         />
         <button
           type="submit"
           id="confirm_pw"
           class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          onclick="checkPassword()"
+          onclick="confirmPw()"
         >
           비밀번호 확인
         </button>
         <label for="newPW">새 비밀번호</label>
-        <input type="password" id="newPW" name="newPW" class="form-control" />
+        <input
+          type="password"
+          id="newPW"
+          name="newPW"
+          class="form-control"
+          autocomplete="off"
+        />
         <label for="confirmNewPW">새 비밀번호 확인</label>
         <input
           type="password"
           id="confirmNewPW"
           name="confirmNewPW"
+          autocomplete="off"
           class="form-control"
         />
         <button
