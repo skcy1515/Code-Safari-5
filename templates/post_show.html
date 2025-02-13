@@ -316,6 +316,7 @@
               alert(response.msg);
               addCommentToList(response.content);
               $("#commentInput").val(""); // 입력창 초기화
+              window.location.href = `/post/${postid}`;
             }
           },
           error: function (xhr) {
@@ -372,8 +373,7 @@
       }
 
       // 댓글 삭제
-      function deleteComment() {
-        let commentid = $("li").data("comment-id");
+      function deleteComment(commentid) {
         // 현재 페이지 URL에서 postid 추출
         let postid = window.location.pathname.split("/")[2]; // URL이 "/post/123"일 경우, postid = "123"
         if (confirm("댓글을 삭제하시겠습니까?")) {

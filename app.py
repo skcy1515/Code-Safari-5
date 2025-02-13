@@ -349,11 +349,13 @@ def delete_comment():
 
     # 댓글 찾기
     comment = db.Comments.find_one({"commentid": commentid})
+    print(comment)
     if not comment:
         return jsonify({'result': 'fail', 'msg': '댓글을 찾을 수 없습니다.'}), 400
 
     # 댓글 작성자와 로그인한 사용자가 일치하는지 확인
     userid = session['userid']
+    print(userid)
     if comment.get("author") != userid:
         return jsonify({"result": "fail", "msg": "작성자만 삭제할 수 있습니다."}), 403
 
