@@ -121,6 +121,7 @@ def uploadPost():
     title = request.form['title']
     content = request.form['content']
     author = session['userid']  # 세션에서 사용자 ID 가져오기
+    likes = 0
 
     filename = None
     isimage = False
@@ -150,6 +151,7 @@ def uploadPost():
         'content': content,
         'author': author,
         'isimage': isimage,  # 이미지 여부 추가
+        'likes' : likes,
         'createdat': datetime.now(),
         'updatedat': datetime.now()
     }
@@ -509,6 +511,17 @@ def get_keyword_posts():
     ))
 
     return jsonify({"result": "success", "posts": posts, "keyword" : keyword}), 200
+
+# 게시글 좋아요 순으로 검색
+@app.route('/likesPosts', methods=['GET'])
+def get_likes_posts():
+    if 'userid' not in session:  # 로그인 확인
+        return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'}), 401
+
+    # 좋아요 순으로 정렬
+    posts = list(db.Posts.find({}, {'_id': 0}).sort("likes", -1))
+
+    return jsonify({"result": "success", "posts": posts}), 200
 
 if __name__ == '__main__':
     app.run('0.0.0.0',port=5000, debug=True)
