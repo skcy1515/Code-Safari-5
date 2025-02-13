@@ -96,6 +96,9 @@
         padding: 15px;
         border-bottom: 1px solid #ddd;
         cursor: pointer;
+        white-space: nowrap; /* 한 줄만 표시 */
+        overflow: hidden; /* 넘치는 내용 감춤 */
+        text-overflow: ellipsis; /* 말줄임(...) 표시 */
       }
       .post-item:hover {
         background-color: #f8f9fa;
@@ -107,7 +110,7 @@
     <div class="home-icon2" onclick="window.location.href='/mypage'">📜</div>
     <div class="home-icon" onclick="window.location.href='/'">🏠</div>
     <div class="container mt-4">
-      <ul id="postList" class="list-unstyled"></ul>
+      <ul id="postList" class="list-unstyled text-2xl"></ul>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
