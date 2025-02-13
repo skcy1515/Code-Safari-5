@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, jsonify, session
 from pymongo import MongoClient
-from werkzeug.utils import secure_filename # 파일 이름에 사용할 수 없는 특수 문자를 제거하여 안전한 파일 이름을 생성하는 유틸리티 함수
 from bson.objectid import ObjectId
 from datetime import datetime
 import bcrypt
 import os # 파일 경로 처리와 파일 삭제 등을 위한 모듈
+import uuid
 
 app = Flask(__name__)
 
@@ -128,8 +128,8 @@ def uploadPost():
     extension = None
 
     if file:
-        # secure_filename(): 특수 문자 제거
-        filename = secure_filename(file.filename)
+        extension = file.filename.rsplit('.', 1)[-1].lower()  # 확장자 추출
+        filename = f"{uuid.uuid4().hex}.{extension}"  # 랜덤한 UUID 파일명 생성
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename) # 경로 지정 ex) ./static/uploads/image.jpg
 
         # 파일 이름이 이미 존재하는지 확인
@@ -409,7 +409,8 @@ def update_post(postid):
 
     # 파일 업로드 처리
     if file:
-        filename = secure_filename(file.filename)
+        extension = file.filename.rsplit('.', 1)[-1].lower()  # 확장자 추출
+        filename = f"{uuid.uuid4().hex}.{extension}"  # 랜덤한 UUID 파일명 생성
         file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
 
         # 파일 이름이 중복되면 처리
