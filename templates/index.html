@@ -288,7 +288,7 @@
               $("#cardsContainer").empty(); // 기존 목록 초기화
               if (response.result === "success") {
                 if (response.posts.length === 0) {
-                    $("#cardsContainer").append("<p class='text-gray-500'>검색 결과가 없습니다.</p>");
+                    $("#cardsContainer").append("<p class='text-gray-100 text-xl'>검색 결과가 없습니다.</p>");
                 } else {
                     response.posts.forEach((post) => {
                         addCard(post.file, post.title, post.content, post.postid, post.isimage, post.likes);
@@ -315,7 +315,7 @@
               $("#cardsContainer").empty(); // 기존 목록 초기화
               if (response.result === "success") {
                 if (response.posts.length === 0) {
-                    $("#cardsContainer").append("<p class='text-gray-500'>검색 결과가 없습니다.</p>");
+                    $("#cardsContainer").append("<p class='text-gray-100 text-xl'>검색 결과가 없습니다.</p>");
                 } else {
                   response.posts.forEach((post) => {
                         addCard(post.file, post.title, post.content, post.postid, post.isimage, post.likes);

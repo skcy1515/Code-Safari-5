@@ -38,7 +38,8 @@
       }
       @font-face {
         font-family: "S-CoreDream-7";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff") format("woff");
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff")
+          format("woff");
         font-weight: 700;
       }
 
@@ -93,7 +94,7 @@
         background-repeat: no-repeat; /* 배경 반복 제거 */
         background-attachment: fixed; /* 배경 이미지 고정 */
       }
-      .custom-font{
+      .custom-font {
         font-family: "S-CoreDream-7", sans-serif;
       }
     </style>
@@ -113,6 +114,7 @@
             id="title"
             required
             autocomplete="off"
+            maxlength="100"
           />
         </div>
         <div class="mb-3">
@@ -123,10 +125,13 @@
             rows="6"
             required
             autocomplete="off"
+            maxlength="10000"
           ></textarea>
         </div>
         <div class="mb-3">
-          <label for="file" class="form-label fs-4 custom-font">파일 추가</label>
+          <label for="file" class="form-label fs-4 custom-font"
+            >파일 추가</label
+          >
           <input
             class="form-control fs-6"
             type="file"
