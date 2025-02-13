@@ -43,6 +43,9 @@
         margin: 0; /* 여백 제거 */
         padding: 0; /* 패딩 제거 */
       }
+      .custom-font{
+        font-family: "S-CoreDream-6";
+      }
       body {
         font-family: "S-CoreDream-5";
         background-image: url('{{ url_for("static", filename="post.png") }}');
@@ -57,13 +60,13 @@
         right: 20px;
         width: 50px;
         height: 50px;
-        border: 2px solid black;
+        border: 1px solid white;
         text-align: center;
         line-height: 50px;
         cursor: pointer;
         font-weight: bold;
         border-radius: 5px;
-        font-size: 24px;
+        font-size: 35px;
       }
       .home-icon2 {
         position: absolute;
@@ -71,13 +74,13 @@
         right: 80px;
         width: 50px;
         height: 50px;
-        border: 2px solid black;
+        border: 1px solid white;
         text-align: center;
         line-height: 50px;
         cursor: pointer;
         font-weight: bold;
         border-radius: 5px;
-        font-size: 24px;
+        font-size: 35px;
       }
       .post-title {
         padding-bottom: 20px;
@@ -159,7 +162,7 @@
       <div
         class="post-header d-flex justify-content-between align-items-center"
       >
-        <h2 id="postTitle">게시글 제목</h2>
+        <h2 id="postTitle" class="custom-font">게시글 제목</h2>
         <!-- 제목 삽입 -->
       </div>
       <hr />
