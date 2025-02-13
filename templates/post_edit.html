@@ -36,6 +36,11 @@
           format("woff");
         font-weight: 600;
       }
+      @font-face {
+        font-family: "S-CoreDream-7";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff") format("woff");
+        font-weight: 700;
+      }
 
       @font-face {
         font-family: "S-CoreDream-8";
@@ -88,16 +93,19 @@
         background-repeat: no-repeat; /* 배경 반복 제거 */
         background-attachment: fixed; /* 배경 이미지 고정 */
       }
+      .custom-font{
+        font-family: "S-CoreDream-7", sans-serif;
+      }
     </style>
   </head>
   <body>
-    <div class="page-title text-center">게시글 수정</div>
+    <div class="page-title text-center fs-1">게시글 수정</div>
 
     <div class="container">
       <form id="editPostForm">
         <input type="hidden" id="postid" />
         <div class="mb-3">
-          <label for="title" class="form-label fs-4">제목</label>
+          <label for="title" class="form-label fs-4 custom-font">제목</label>
           <!-- 제목 크기 조절 -->
           <input
             type="text"
@@ -108,7 +116,7 @@
           />
         </div>
         <div class="mb-3">
-          <label for="content" class="form-label fs-4">내용</label>
+          <label for="content" class="form-label fs-4 custom-font">내용</label>
           <textarea
             class="form-control"
             id="content"
@@ -118,9 +126,9 @@
           ></textarea>
         </div>
         <div class="mb-3">
-          <label for="file" class="form-label">파일 추가</label>
+          <label for="file" class="form-label fs-4 custom-font">파일 추가</label>
           <input
-            class="form-control fs-4"
+            class="form-control fs-6"
             type="file"
             id="file"
             autocomplete="off"
