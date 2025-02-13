@@ -257,14 +257,14 @@
                   : ""
               }
             <div class="p-4">
-                <div class="flex items-center justify-between">  <!-- ✅ 제목과 좋아요를 같은 줄에 정렬 -->
-                    <a href="${postUrl}" class="card-title text-lg font-bold text-blue-500 hover:underline title-preview">${title}</a>
-                      <div class="flex items-center space-x-1">  <!-- ✅ 좋아요(❤️)와 숫자를 가로 정렬 -->
+                <div class="flex items-center justify-between">  
+                    <a href="${postUrl}" class="card-title text-xl font-bold text-blue-500 hover:underline title-preview">${title}</a>
+                      <div class="flex items-center space-x-1"> 
                         <span class="text-gray-600 text-sm">❤️</span>
                         <span class="text-gray-600 text-sm">${likes}</span>
                     </div>
                 </div>
-                <p class="text-gray-700 mt-2 text-preview">${content}</p>  <!-- ✅ 제목 & 좋아요 아래 위치 -->
+                <p class="text-gray-700 text-lg mt-2 text-preview">${content}</p>  
             </div>
           </div>
         `;
