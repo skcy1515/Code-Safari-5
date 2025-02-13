@@ -211,17 +211,35 @@
           dataType: "json",
           success: function (response) {
             if (response.result === "success") {
-              $("#cardsContainer").empty(); // 기존 목록 초기화
+              let cardsHTML = ""; // HTML 문자열을 미리 생성
+
               response.posts.forEach((post) => {
-                addCard(
-                  post.file,
-                  post.title,
-                  post.content,
-                  post.postid,
-                  post.isimage,
-                  post.likes
-                );
+                let postUrl = `/post/${post.postid}`;
+
+                cardsHTML += `
+                  <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
+                    ${
+                      post.file && post.isimage
+                        ? `<div class="w-full h-48 overflow-hidden">
+                              <img src="${post.file}" alt="Card Image" class="w-full h-full object-cover">
+                          </div>`
+                        : ""
+                    }
+                    <div class="p-4">
+                      <div class="flex items-center justify-between">  
+                          <a href="${postUrl}" class="card-title text-xl font-bold text-blue-500 hover:underline title-preview">${post.title}</a>
+                          <div class="flex items-center space-x-1"> 
+                              <span class="text-gray-600 text-sm">❤️</span>
+                              <span class="text-gray-600 text-sm">${post.likes}</span>
+                          </div>
+                      </div>
+                      <p class="text-gray-700 text-lg mt-2 text-preview">${post.content}</p>  
+                    </div>
+                  </div>
+                `;
               });
+
+              $("#cardsContainer").html(cardsHTML); // 한 번에 삽입
             }
           },
         });
@@ -241,93 +259,118 @@
         });
       });
 
-      function addCard(file, title, content, postid, isimage, likes) {
-        let postUrl = `/post/${postid}`;
-
-        let cardHTML = `
-          <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
-              ${
-                file && isimage
-                  ? `<div class="w-full h-48 overflow-hidden">
-                        <img src="${file}" alt="Card Image" class="w-full h-full object-cover">
-                    </div>`
-                  : ""
-              }
-            <div class="p-4">
-                <div class="flex items-center justify-between">  
-                    <a href="${postUrl}" class="card-title text-xl font-bold text-blue-500 hover:underline title-preview">${title}</a>
-                      <div class="flex items-center space-x-1"> 
-                        <span class="text-gray-600 text-sm">❤️</span>
-                        <span class="text-gray-600 text-sm">${likes}</span>
-                    </div>
-                </div>
-                <p class="text-gray-700 text-lg mt-2 text-preview">${content}</p>  
-            </div>
-          </div>
-        `;
-
-        $("#cardsContainer").append(cardHTML);
-      }
-
       // 게시글 검색
       function searchKeyword() {
         let keyword = $("#searching").val().trim();
+
         if (keyword === "") {
-          loadPosts(); // 공백 입력 시 전체 게시글 로드 
+          loadPosts(); // 공백 입력 시 전체 게시글 로드
           return;
         }
+
         $.ajax({
-            url: "/keywordPosts",
-            type: "GET",
-            data: { inputKeyword: keyword },
-            dataType: "json",
-            success: function (response) {
-              $("#cardsContainer").empty(); // 기존 목록 초기화
-              if (response.result === "success") {
-                if (response.posts.length === 0) {
-                    $("#cardsContainer").append("<p class='text-gray-100 text-xl'>검색 결과가 없습니다.</p>");
-                } else {
-                    response.posts.forEach((post) => {
-                        addCard(post.file, post.title, post.content, post.postid, post.isimage, post.likes);
-                    });
-                }
+          url: "/keywordPosts",
+          type: "GET",
+          data: { inputKeyword: keyword },
+          dataType: "json",
+          success: function (response) {
+            let cardsHTML = ""; // HTML을 미리 문자열로 저장
+
+            if (response.result === "success") {
+              if (response.posts.length === 0) {
+                cardsHTML = "<p class='text-gray-100 text-xl'>검색 결과가 없습니다.</p>";
+              } else {
+                response.posts.forEach((post) => {
+                  let postUrl = `/post/${post.postid}`;
+
+                  cardsHTML += `
+                    <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
+                      ${
+                        post.file && post.isimage
+                          ? `<div class="w-full h-48 overflow-hidden">
+                                <img src="${post.file}" alt="Card Image" class="w-full h-full object-cover" loading="lazy">
+                            </div>`
+                          : ""
+                      }
+                      <div class="p-4">
+                        <div class="flex items-center justify-between">  
+                            <a href="${postUrl}" class="card-title text-xl font-bold text-blue-500 hover:underline title-preview">${post.title}</a>
+                            <div class="flex items-center space-x-1"> 
+                                <span class="text-gray-600 text-sm">❤️</span>
+                                <span class="text-gray-600 text-sm">${post.likes}</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 text-lg mt-2 text-preview">${post.content}</p>  
+                      </div>
+                    </div>
+                  `;
+                });
+              }
             }
-        },
-        error: function (xhr) {
-          if (xhr.status === 401) {
+
+            $("#cardsContainer").html(cardsHTML); // 한 번에 삽입
+          },
+          error: function (xhr) {
+            if (xhr.status === 401) {
               alert(xhr.responseJSON.msg);
               window.location.href = "/login";
             }
-        }
+          }
         });
       }
 
       // 게시글 좋아요 순으로 검색
       function searchLikes() {
         $.ajax({
-            url: "/likesPosts",
-            type: "GET",
-            dataType: "json",
-            success: function (response) {
-              $("#cardsContainer").empty(); // 기존 목록 초기화
-              if (response.result === "success") {
-                if (response.posts.length === 0) {
-                    $("#cardsContainer").append("<p class='text-gray-100 text-xl'>검색 결과가 없습니다.</p>");
-                } else {
-                  response.posts.forEach((post) => {
-                        addCard(post.file, post.title, post.content, post.postid, post.isimage, post.likes);
-                    });
-                }
+          url: "/likesPosts",
+          type: "GET",
+          dataType: "json",
+          success: function (response) {
+            let cardsHTML = ""; // HTML을 미리 문자열로 저장
+
+            if (response.result === "success") {
+              if (response.posts.length === 0) {
+                cardsHTML = "<p class='text-gray-100 text-xl'>검색 결과가 없습니다.</p>";
+              } else {
+                response.posts.forEach((post) => {
+                  let postUrl = `/post/${post.postid}`;
+
+                  cardsHTML += `
+                    <div class="card-item bg-white shadow-md rounded-lg overflow-hidden w-full max-w-[700px]">
+                      ${
+                        post.file && post.isimage
+                          ? `<div class="w-full h-48 overflow-hidden">
+                                <img src="${post.file}" alt="Card Image" class="w-full h-full object-cover" loading="lazy">
+                            </div>`
+                          : ""
+                      }
+                      <div class="p-4">
+                        <div class="flex items-center justify-between">  
+                            <a href="${postUrl}" class="card-title text-xl font-bold text-blue-500 hover:underline title-preview">${post.title}</a>
+                            <div class="flex items-center space-x-1"> 
+                                <span class="text-gray-600 text-sm">❤️</span>
+                                <span class="text-gray-600 text-sm">${post.likes}</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 text-lg mt-2 text-preview">${post.content}</p>  
+                      </div>
+                    </div>
+                  `;
+                });
+              }
             }
-        },
-        error: function (xhr) {
-          if (xhr.status === 401) {
+
+            $("#cardsContainer").html(cardsHTML); // 한 번에 삽입
+          },
+          error: function (xhr) {
+            if (xhr.status === 401) {
               alert(xhr.responseJSON.msg);
               window.location.href = "/login";
             }
-        }
+          }
         });
       }
+
     </script>
   </body>
 </html>
