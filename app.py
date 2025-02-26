@@ -18,7 +18,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "default_secret_key")
 UPLOAD_FOLDER = "./static/uploads"  # 파일을 저장할 경로 변수
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # 파일을 저장할 경로 설정
 
-uri = "mongodb+srv://skcy151515:IyuTp1jwPnkfLXXl@cluster0.es5up.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tlsAllowInvalidCertificates=true"
+uri = # 몽고DB uri 복붙하기
 client = MongoClient(uri, 27017)  # MongoDB는 27017 포트로 돌아갑니다.
 db = client.dbmemo2
 
